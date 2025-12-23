@@ -1,15 +1,42 @@
-export default function Home() {
+"use client";
+
+import DinoDraw from "../ui/DinoDraw";
+import ShipDraw from "../ui/ShipDraw";
+import Link from "next/link";
+import { Nivel } from "@/data/types";
+
+const drawComponents = {
+  DinoDraw: DinoDraw,
+  ShipDraw: ShipDraw,
+};
+
+const mapping: { link: string; status: "completed" | "next" | "locked" }[] = [
+  { link: "/nivel-1", status: "completed" },
+  { link: "/nivel-2", status: "next" },
+  { link: "/nivel-3", status: "locked" },
+  { link: "/nivel-4", status: "locked" },
+  { link: "/nivel-5", status: "locked" },
+  { link: "/nivel-6", status: "locked" },
+];
+
+export default function Home({ nivel }: { nivel: Nivel }) {
   return (
     <div className="ml-10 w-1/3">
       <div
-        className="bg-green-700 rounded-2xl w-full flex justify-between items-center h-25 p-3"
-        style={{ fontFamily: "var(--font-custom)" }}
+        className="rounded-2xl w-full flex justify-between items-center h-25 p-3"
+        style={{
+          fontFamily: "var(--font-custom)",
+          backgroundColor: nivel.colors.secondary,
+        }}
       >
         <div className="flex flex-col h-full justify-center">
-          <span className="text-white/80 text-xl">NIVEL 1 MODULO 1</span>
-          <span className="text-white text-2xl">Tipos de Circuitos</span>
+          <span className="text-white/80 text-xl">{nivel.module}</span>
+          <span className="text-white text-2xl">{nivel.title}</span>
         </div>
-        <div className="border-2 gap-4 border-green-600 cursor-pointer flex items-center h-15 px-4 rounded-xl">
+        <div
+          className="border-2 gap-4 cursor-pointer flex items-center h-15 px-4 rounded-xl"
+          style={{ borderColor: nivel.colors.primary }}
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="24"
@@ -42,84 +69,114 @@ export default function Home() {
           className="text-white text-xl"
           style={{ fontFamily: "var(--font-custom)" }}
         >
-          Tipos de Circuitos
+          {nivel.title}
         </span>
         <div className="flex-1 h-1 rounded-full bg-white/50"></div>
       </div>
-      <div className="mt-10">
-        <div className="ml-[60%] cursor-pointer border-5 hover:border-[#58cc02] transition-colors  border-white/50 rounded-full w-25 flex items-center p-2 justify-center">
-          <TodoCircle />
+      <div className="mt-10 relative">
+        <div
+          className="relative flex-col max-h-[calc(100vh-250px)] overflow-y-scroll overflow-x-hidden"
+          style={{
+            scrollbarWidth: "none",
+            msOverflowStyle: "none",
+            WebkitOverflowScrolling: "touch",
+            maskImage:
+              "linear-gradient(to bottom, transparent 0%, black 5%, black 95%, transparent 100%)",
+            WebkitMaskImage:
+              "linear-gradient(to bottom, transparent 0%, black 5%, black 95%, transparent 100%)",
+          }}
+        >
+          <style jsx>{`
+            div::-webkit-scrollbar {
+              display: none;
+            }
+          `}</style>
+          {mapping.map((module, index) => (
+            <ModuleCircle
+              key={index}
+              status={module.status}
+              link={module.link}
+              index={index}
+              colors={nivel.colors}
+            />
+          ))}
+
+          <div className="absolute top-0 left-[10%]">
+            {(() => {
+              const DrawComponent =
+                drawComponents[nivel.draw as keyof typeof drawComponents];
+              return DrawComponent ? <DrawComponent /> : null;
+            })()}
+          </div>
         </div>
       </div>
     </div>
   );
 }
 
-function TodoCircle() {
+function ModuleCircle({
+  status,
+  link,
+  index,
+  colors,
+}: {
+  status: "completed" | "next" | "locked";
+  link: string;
+  index: number;
+  colors: { primary: string; secondary: string };
+}) {
+  const marginPattern = [70, 80, 70, 60, 50, 60];
+  const marginLeft = marginPattern[index % marginPattern.length];
+
+  return (
+    <Link
+      href={link || "#"}
+      className={`${
+        status === "completed" || status === "next"
+          ? "cursor-pointer hover:scale-105 transition-transform"
+          : "cursor-not-allowed"
+      } relative rounded-full w-25 flex items-center p-2 justify-center`}
+      style={{ marginLeft: `${marginLeft}%` }}
+    >
+      <CompleteCircle status={status} colors={colors} />
+    </Link>
+  );
+}
+
+function CompleteCircle({
+  status,
+  colors,
+}: {
+  status: "completed" | "next" | "locked";
+  colors: { primary: string; secondary: string };
+}) {
+  const isActive = status === "completed" || status === "next";
+  const isLocked = status === "locked";
+
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      className="w-20"
+      className={`w-20 ${isLocked ? "opacity-80" : ""}`}
       fill="none"
-      viewBox="0 0 602 553"
+      viewBox="0 0 514 530"
     >
-      <g filter="url(#filter0_d_2016_2482)">
-        <ellipse cx="300" cy="250" fill="#58cc02" rx="300" ry="250" />
-      </g>
-      <ellipse cx="300" cy="250" fill="#46a302" rx="250" ry="200" />
-      <mask
-        id="mask0_2016_2482"
-        width="202"
-        height="189"
-        x="199"
-        y="156"
-        style={{ maskType: "luminance" }}
-        maskUnits="userSpaceOnUse"
-      >
-        <path fill="#fff" d="M400.714 156.206H199.285v188.588h201.429z" />
-      </mask>
-      <g mask="url(#mask0_2016_2482)">
-        <path
-          fill="#fff"
-          d="M284.906 165.713c6.095-12.676 24.092-12.676 30.187 0l17.497 36.395a16.76 16.76 0 0 0 13.151 9.394l40.138 4.699c14.344 1.679 19.994 19.558 9.234 29.22l-28.746 25.814a16.84 16.84 0 0 0-5.244 15.876l7.676 37.834c2.831 13.949-11.824 24.892-24.332 18.169l-36.554-19.645a16.72 16.72 0 0 0-15.827 0l-36.554 19.645c-12.508 6.723-27.163-4.22-24.332-18.169l7.676-37.834a16.84 16.84 0 0 0-5.244-15.876l-28.746-25.814c-10.76-9.662-5.11-27.541 9.234-29.22l40.138-4.699a16.76 16.76 0 0 0 13.151-9.394z"
-        />
-      </g>
-      <defs>
-        <filter
-          id="filter0_d_2016_2482"
-          width="602"
-          height="553"
-          x="0"
-          y="0"
-          colorInterpolationFilters="sRGB"
-          filterUnits="userSpaceOnUse"
-        >
-          <feFlood floodOpacity="0" result="BackgroundImageFix" />
-          <feColorMatrix
-            in="SourceAlpha"
-            result="hardAlpha"
-            type="matrix"
-            values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
-          />
-          <feOffset dx="2" dy="53" />
-          <feComposite in2="hardAlpha" operator="out" />
-          <feColorMatrix
-            type="matrix"
-            values="0 0 0 0 0.27451 0 0 0 0 0.639216 0 0 0 0 0.00784314 0 0 0 1 0"
-          />
-          <feBlend
-            in2="BackgroundImageFix"
-            mode="normal"
-            result="effect1_dropShadow_2016_2482"
-          />
-          <feBlend
-            in="SourceGraphic"
-            in2="effect1_dropShadow_2016_2482"
-            mode="normal"
-            result="shape"
-          />
-        </filter>
-      </defs>
+      {/* HEXÁGONO EXTERIOR */}
+      <path
+        fill={isActive ? colors.primary : "#37464f"}
+        d="m250 0 216.506 125v250L250 500 33.494 375V125z"
+      />
+
+      {/* HEXÁGONO INTERIOR */}
+      <path
+        fill={isActive ? colors.secondary : "#2c383f"}
+        d="m250 50 173.205 100v200L250 450 76.795 350V150z"
+      />
+
+      {/* ÍCONO CENTRAL */}
+      <path
+        fill={isLocked ? "#9aa5ab" : "#ffffff"}
+        d="M232.679 180c7.698-13.333 26.944-13.333 34.642 0l51.961 90c7.698 13.333-1.924 30-17.32 30H198.038c-15.396 0-25.018-16.667-17.32-30z"
+      />
     </svg>
   );
 }
