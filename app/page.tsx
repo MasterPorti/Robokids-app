@@ -2,7 +2,7 @@ import Home from "./components/Homemenu";
 import Navbar from "./components/Navegation";
 import niveles from "@/data/nivel";
 
-const nivel1 = niveles.find((nivel) => nivel.id === 1);
+const nivel1 = niveles.find((nivel) => nivel.id === 2);
 
 export default function HomePage() {
   if (!nivel1) {
@@ -11,7 +11,7 @@ export default function HomePage() {
 
   return (
     <main
-      className="min-h-screen flex p-5"
+      className="min-h-screen flex p-5 justify-between"
       style={{
         backgroundColor: "#131f24",
         backgroundImage:
@@ -21,7 +21,7 @@ export default function HomePage() {
     >
       <Navbar />
       <Home nivel={nivel1} />
-      <div className="ml-5">
+      <div className="ml-5 w-60">
         <div className="flex gap-3 items-center">
           <Robopuntos />
           <span
