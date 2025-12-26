@@ -5,10 +5,10 @@ import { NextRequest, NextResponse } from "next/server";
 // POST - Cambiar contraseña de alumno
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const alumnoId = params.id;
+    const { id: alumnoId } = await params;
 
     // Crear clientes de Supabase
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
