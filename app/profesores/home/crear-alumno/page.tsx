@@ -2,7 +2,6 @@
 
 import { useState, useEffect, FormEvent } from "react";
 import { supabase } from "@/lib/supabase"; // Tu cliente principal (con sesión del profesor)
-import { createClient } from "@supabase/supabase-js"; // Para crear el cliente fantasma
 import { useRouter } from "next/navigation";
 
 // 1. Definimos la forma de nuestros datos (Interfaces)
@@ -63,70 +62,33 @@ export default function CrearAlumno() {
       return;
     }
 
-    // 1. Lógica para generar usuario único
-    const randomNum = Math.floor(100 + Math.random() * 900);
-    // Limpiamos el nombre: "José Pérez" -> "joseperez"
-    const nombreLimpio = formData.nombre
-      .split(" ")[0]
-      .toLowerCase()
-      .replace(/[^a-z0-9]/g, "");
-    const nuevoUsuario = `${nombreLimpio}${randomNum}`;
-    const nuevaPassword = Math.random().toString(36).slice(-6);
-    const emailFalso = `${nuevoUsuario}@alumno.local`;
+    try {
+      // Llamar al API endpoint que usa Admin client (NO inicia sesión)
+      const response = await fetch("/api/create-alumno", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          nombre: formData.nombre,
+          tutor: formData.tutor,
+          telefono: formData.telefono,
+          fecha_inscripcion: formData.fecha_inscripcion,
+          dia_pago: parseInt(formData.dia_pago),
+          mensualidad: parseFloat(formData.mensualidad),
+          profesor_id: profesorId,
+        }),
+      });
 
-    // 2. EL TRUCO: Cliente Fantasma (Para no cerrar sesión del profesor)
-    // Aseguramos que las variables de entorno sean strings
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+      const result = await response.json();
 
-    const supabaseTemp = createClient(supabaseUrl, supabaseAnonKey);
-
-    // 3. Crear el usuario en Auth
-    const { data: authData, error: authError } = await supabaseTemp.auth.signUp(
-      {
-        email: emailFalso,
-        password: nuevaPassword,
-        options: {
-          data: { role: "alumno", username: nuevoUsuario },
-        },
+      if (!response.ok) {
+        throw new Error(result.error || "Error al crear alumno");
       }
-    );
 
-    if (authError) {
-      alert("Error creando usuario: " + authError.message);
-      setLoading(false);
-      return;
-    }
-
-    if (!authData.user) {
-      alert("Error: No se pudo obtener el ID del nuevo usuario.");
-      setLoading(false);
-      return;
-    }
-
-    // 4. Guardar los datos en la tabla (Usando el cliente del Profesor)
-    const { error: dbError } = await supabase.from("alumnos").insert([
-      {
-        id: authData.user.id, // ID del usuario recién creado
-        profesor_id: profesorId,
-        nombre_completo: formData.nombre,
-        nombre_tutor: formData.tutor,
-        telefono_tutor: formData.telefono,
-        fecha_inscripcion: formData.fecha_inscripcion,
-        dia_pago: parseInt(formData.dia_pago), // Convertir a número
-        username: nuevoUsuario,
-        mensualidad: parseFloat(formData.mensualidad),
-        activo: true,
-      },
-    ]);
-
-    if (dbError) {
-      alert(
-        "El usuario se creó pero falló al guardar datos: " + dbError.message
-      );
-    } else {
-      // Guardamos las credenciales para mostrarlas
-      setCredenciales({ username: nuevoUsuario, password: nuevaPassword });
+      // Guardar las credenciales para mostrarlas
+      setCredenciales(result.credenciales);
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Error desconocido";
+      alert("Error: " + errorMessage);
     }
 
     setLoading(false);

@@ -9,6 +9,7 @@ interface AlumnoData {
   fecha_inscripcion: string;
   dia_pago: number;
   profesor_id: string;
+  mensualidad?: number;
 }
 
 export async function POST(request: NextRequest) {
@@ -63,6 +64,8 @@ export async function POST(request: NextRequest) {
         fecha_inscripcion: datos.fecha_inscripcion,
         dia_pago: datos.dia_pago,
         username: username,
+        mensualidad: datos.mensualidad || 0,
+        activo: true,
       },
     ]);
 

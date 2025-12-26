@@ -188,30 +188,6 @@ export default function GestionPagosPage() {
     }
   };
 
-  const handleDeletePayment = async (pagoId: string) => {
-    if (!confirm("¿Estás seguro de eliminar este pago?")) return;
-
-    try {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      const token = session?.access_token;
-
-      const res = await fetch(`/api/pagos/${pagoId}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      const data = await res.json();
-
-      if (!res.ok) throw new Error(data.error);
-
-      fetchData(); // Reload data
-    } catch (error) {
-      alert(error instanceof Error ? error.message : "Error al eliminar pago");
-    }
-  };
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("es-MX", {
@@ -386,36 +362,27 @@ export default function GestionPagosPage() {
                         Pagado
                       </span>
                       {item.pago && (
-                        <>
-                          <button
-                            onClick={() => {
-                              // Calculate next month
-                              let nextMes = mes + 1;
-                              let nextAnio = anio;
-                              if (nextMes > 12) {
-                                nextMes = 1;
-                                nextAnio++;
-                              }
-                              handleOpenModal(item, {
-                                mes: nextMes,
-                                anio: nextAnio,
-                              });
-                            }}
-                            className="p-1 px-2 text-blue-500 hover:bg-blue-50 rounded-md transition-colors text-xs font-bold border border-blue-100"
-                            title={`Adelantar pago de ${
-                              months[((mes % 12) + 12) % 12] || "Siguiente Mes"
-                            }`}
-                          >
-                            ⏭️ Adelantar
-                          </button>
-                          <button
-                            onClick={() => handleDeletePayment(item.pago!.id)}
-                            className="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"
-                            title="Eliminar pago"
-                          >
-                            🗑️
-                          </button>
-                        </>
+                        <button
+                          onClick={() => {
+                            // Calculate next month
+                            let nextMes = mes + 1;
+                            let nextAnio = anio;
+                            if (nextMes > 12) {
+                              nextMes = 1;
+                              nextAnio++;
+                            }
+                            handleOpenModal(item, {
+                              mes: nextMes,
+                              anio: nextAnio,
+                            });
+                          }}
+                          className="p-1 px-2 text-blue-500 hover:bg-blue-50 rounded-md transition-colors text-xs font-bold border border-blue-100"
+                          title={`Adelantar pago de ${
+                            months[((mes % 12) + 12) % 12] || "Siguiente Mes"
+                          }`}
+                        >
+                          ⏭️ Adelantar
+                        </button>
                       )}
                     </div>
                   </div>
@@ -505,6 +472,7 @@ export default function GestionPagosPage() {
                 >
                   <option value="efectivo">Efectivo</option>
                   <option value="transferencia">Transferencia</option>
+                  <option value="tarjeta">Tarjeta</option>
                   <option value="otro">Otro</option>
                 </select>
               </div>
