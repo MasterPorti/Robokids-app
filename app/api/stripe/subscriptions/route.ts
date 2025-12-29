@@ -45,17 +45,24 @@ export async function GET(request: NextRequest) {
     });
 
     const invoicesData = invoices.data.map((inv) => {
+      // Handle properties that may not be in type definitions for this API version
+      const invAny = inv as any;
+      const subscription = invAny.subscription;
+      const subscriptionId = typeof subscription === 'string'
+        ? subscription
+        : subscription?.id || null;
+
       return {
         id: inv.id,
         customer_id: inv.customer,
-        subscription_id: inv.subscription,
+        subscription_id: subscriptionId,
         status: inv.status,
         amount_due: inv.amount_due,
         amount_paid: inv.amount_paid,
         currency: inv.currency,
         created: inv.created * 1000,
-        paid: inv.paid,
-        invoice_pdf: inv.invoice_pdf,
+        paid: invAny.paid,
+        invoice_pdf: invAny.invoice_pdf,
       };
     });
 
