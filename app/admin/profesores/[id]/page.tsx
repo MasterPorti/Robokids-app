@@ -126,7 +126,8 @@ export default function ProfesorDetallePage() {
         throw new Error(result.error || "Error al registrar pago");
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Error desconocido";
+      const errorMessage =
+        error instanceof Error ? error.message : "Error desconocido";
       alert("❌ Error: " + errorMessage);
     }
     setProcesandoPago(false);
@@ -151,7 +152,8 @@ export default function ProfesorDetallePage() {
         throw new Error(result.error || "Error al eliminar pago");
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Error desconocido";
+      const errorMessage =
+        error instanceof Error ? error.message : "Error desconocido";
       alert("❌ Error: " + errorMessage);
     }
   }
@@ -164,11 +166,14 @@ export default function ProfesorDetallePage() {
 
     setCambiandoPassword(true);
     try {
-      const response = await fetch(`/api/admin/profesores/${profesorId}/password`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password: nuevaPassword }),
-      });
+      const response = await fetch(
+        `/api/admin/profesores/${profesorId}/password`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ password: nuevaPassword }),
+        }
+      );
 
       const result = await response.json();
 
@@ -180,7 +185,8 @@ export default function ProfesorDetallePage() {
         throw new Error(result.error || "Error al cambiar contraseña");
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Error desconocido";
+      const errorMessage =
+        error instanceof Error ? error.message : "Error desconocido";
       alert("❌ Error: " + errorMessage);
     }
     setCambiandoPassword(false);
@@ -188,13 +194,16 @@ export default function ProfesorDetallePage() {
 
   if (loading) {
     return (
-      <div style={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        height: "100vh",
-        fontFamily: "system-ui",
-      }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+          fontFamily: "system-ui",
+        }}
+        className="bg-black text-white"
+      >
         <p>Cargando...</p>
       </div>
     );
@@ -202,13 +211,16 @@ export default function ProfesorDetallePage() {
 
   if (!profesor) {
     return (
-      <div style={{
-        padding: "40px",
-        textAlign: "center",
-        fontFamily: "system-ui",
-      }}>
+      <div
+        style={{
+          padding: "40px",
+          textAlign: "center",
+          fontFamily: "system-ui",
+        }}
+        className="bg-black text-white"
+      >
         <h1>Profesor no encontrado</h1>
-        <Link href="/admin" style={{ color: "#2563eb" }}>
+        <Link href="/admin" className="text-blue-500 hover:text-blue-400">
           Volver al dashboard
         </Link>
       </div>
@@ -221,48 +233,61 @@ export default function ProfesorDetallePage() {
   );
 
   return (
-    <div style={{
-      padding: "20px",
-      background: "#f9fafb",
-      minHeight: "100vh",
-      fontFamily: "system-ui, -apple-system, sans-serif",
-    }}>
-      <div style={{
-        maxWidth: "1200px",
-        margin: "0 auto",
-      }}>
+    <div
+      style={{
+        padding: "20px",
+        minHeight: "100vh",
+        fontFamily: "system-ui, -apple-system, sans-serif",
+      }}
+      className="bg-black"
+    >
+      <div
+        style={{
+          maxWidth: "1200px",
+          margin: "0 auto",
+        }}
+      >
         {/* Header */}
-        <Link href="/admin" style={{
-          color: "#2563eb",
-          textDecoration: "none",
-          fontSize: "14px",
-          display: "inline-flex",
-          alignItems: "center",
-          marginBottom: "20px",
-        }}>
+        <Link
+          href="/admin"
+          className="text-blue-500 hover:text-blue-400"
+          style={{
+            textDecoration: "none",
+            fontSize: "14px",
+            display: "inline-flex",
+            alignItems: "center",
+            marginBottom: "20px",
+          }}
+        >
           ← Volver al Dashboard
         </Link>
 
         {/* Info del Profesor */}
-        <div style={{
-          background: "white",
-          padding: "30px",
-          borderRadius: "12px",
-          boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-          marginTop: "20px",
-          marginBottom: "30px",
-        }}>
-          <div style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginBottom: "20px",
-          }}>
-            <h1 style={{
-              margin: "0",
-              fontSize: "28px",
-              fontWeight: "bold",
-            }}>
+        <div
+          className="bg-gray-800 text-white"
+          style={{
+            padding: "30px",
+            borderRadius: "12px",
+            boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+            marginTop: "20px",
+            marginBottom: "30px",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: "20px",
+            }}
+          >
+            <h1
+              style={{
+                margin: "0",
+                fontSize: "28px",
+                fontWeight: "bold",
+              }}
+            >
               👨‍🏫 {profesor.nombre}
             </h1>
             <button
@@ -282,37 +307,67 @@ export default function ProfesorDetallePage() {
             </button>
           </div>
 
-          <div style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-            gap: "15px",
-            marginTop: "20px",
-          }}>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+              gap: "15px",
+              marginTop: "20px",
+            }}
+          >
             <div>
-              <p style={{ margin: "0", fontSize: "12px", color: "#666" }}>Usuario</p>
-              <p style={{ margin: "5px 0 0 0", fontWeight: "600" }}>@{profesor.username}</p>
+              <p style={{ margin: "0", fontSize: "12px" }} className="text-gray-400">
+                Usuario
+              </p>
+              <p style={{ margin: "5px 0 0 0", fontWeight: "600" }}>
+                @{profesor.username}
+              </p>
             </div>
             {profesor.email && (
               <div>
-                <p style={{ margin: "0", fontSize: "12px", color: "#666" }}>Email</p>
-                <p style={{ margin: "5px 0 0 0", fontWeight: "600" }}>{profesor.email}</p>
+                <p style={{ margin: "0", fontSize: "12px" }} className="text-gray-400">
+                  Email
+                </p>
+                <p style={{ margin: "5px 0 0 0", fontWeight: "600" }}>
+                  {profesor.email}
+                </p>
               </div>
             )}
             {profesor.telefono && (
               <div>
-                <p style={{ margin: "0", fontSize: "12px", color: "#666" }}>Teléfono</p>
-                <p style={{ margin: "5px 0 0 0", fontWeight: "600" }}>{profesor.telefono}</p>
+                <p style={{ margin: "0", fontSize: "12px" }} className="text-gray-400">
+                  Teléfono
+                </p>
+                <p style={{ margin: "5px 0 0 0", fontWeight: "600" }}>
+                  {profesor.telefono}
+                </p>
               </div>
             )}
             <div>
-              <p style={{ margin: "0", fontSize: "12px", color: "#666" }}>Total Alumnos</p>
-              <p style={{ margin: "5px 0 0 0", fontWeight: "600", color: "#2563eb" }}>
+              <p style={{ margin: "0", fontSize: "12px" }} className="text-gray-400">
+                Total Alumnos
+              </p>
+              <p
+                style={{
+                  margin: "5px 0 0 0",
+                  fontWeight: "600",
+                  color: "#2563eb",
+                }}
+              >
                 {profesor.alumnos.length}
               </p>
             </div>
             <div>
-              <p style={{ margin: "0", fontSize: "12px", color: "#666" }}>Ingreso Mensual</p>
-              <p style={{ margin: "5px 0 0 0", fontWeight: "600", color: "#10b981" }}>
+              <p style={{ margin: "0", fontSize: "12px" }} className="text-gray-400">
+                Ingreso Mensual
+              </p>
+              <p
+                style={{
+                  margin: "5px 0 0 0",
+                  fontWeight: "600",
+                  color: "#10b981",
+                }}
+              >
                 ${totalMensualidad.toLocaleString()}
               </p>
             </div>
@@ -320,63 +375,104 @@ export default function ProfesorDetallePage() {
         </div>
 
         {/* Pagos del Mes Actual */}
-        <div style={{
-          background: "white",
-          padding: "30px",
-          borderRadius: "12px",
-          boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-          marginBottom: "30px",
-        }}>
-          <h2 style={{
-            margin: "0 0 20px 0",
-            fontSize: "20px",
-            fontWeight: "600",
-          }}>
-            💰 Pagos de {new Date().toLocaleString('es-ES', { month: 'long', year: 'numeric' })} ({pagos.length})
+        <div
+          className="bg-gray-800 text-white"
+          style={{
+            padding: "30px",
+            borderRadius: "12px",
+            boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+            marginBottom: "30px",
+          }}
+        >
+          <h2
+            style={{
+              margin: "0 0 20px 0",
+              fontSize: "20px",
+              fontWeight: "600",
+            }}
+          >
+            💰 Pagos de{" "}
+            {new Date().toLocaleString("es-ES", {
+              month: "long",
+              year: "numeric",
+            })}{" "}
+            ({pagos.length})
           </h2>
 
           {pagos.length === 0 ? (
-            <p style={{ textAlign: "center", color: "#666", padding: "20px 0" }}>
+            <p
+              className="text-gray-400"
+              style={{ textAlign: "center", padding: "20px 0" }}
+            >
               No hay pagos registrados para este mes
             </p>
           ) : (
-            <div style={{
-              display: "grid",
-              gap: "12px",
-            }}>
+            <div
+              style={{
+                display: "grid",
+                gap: "12px",
+              }}
+            >
               {pagos.map((pago) => (
                 <div
                   key={pago.id}
+                  className="bg-green-900/30 border-green-600"
                   style={{
                     display: "flex",
                     justifyContent: "space-between",
                     alignItems: "center",
                     padding: "16px",
-                    background: "#d1fae5",
                     borderRadius: "8px",
-                    border: "1px solid #10b981",
+                    border: "1px solid",
                   }}
                 >
                   <div>
-                    <p style={{ margin: "0", fontWeight: "600", fontSize: "16px" }}>
+                    <p
+                      style={{
+                        margin: "0",
+                        fontWeight: "600",
+                        fontSize: "16px",
+                      }}
+                    >
                       {pago.alumno?.nombre_completo || "Alumno"}
                     </p>
-                    <p style={{ margin: "5px 0 0 0", fontSize: "14px", color: "#666" }}>
-                      {new Date(pago.fecha_pago).toLocaleDateString('es-ES')}
+                    <p
+                      className="text-gray-300"
+                      style={{
+                        margin: "5px 0 0 0",
+                        fontSize: "14px",
+                      }}
+                    >
+                      {new Date(pago.fecha_pago).toLocaleDateString("es-ES")}
                       {pago.metodo_pago && (
                         <span style={{ marginLeft: "8px" }}>
-                          • <span style={{ textTransform: "capitalize" }}>{pago.metodo_pago}</span>
+                          •{" "}
+                          <span style={{ textTransform: "capitalize" }}>
+                            {pago.metodo_pago}
+                          </span>
                         </span>
                       )}
                     </p>
                   </div>
                   <div style={{ textAlign: "right", marginRight: "20px" }}>
-                    <p style={{ margin: "0", fontWeight: "600", color: "#10b981", fontSize: "18px" }}>
+                    <p
+                      style={{
+                        margin: "0",
+                        fontWeight: "600",
+                        color: "#10b981",
+                        fontSize: "18px",
+                      }}
+                    >
                       ${pago.monto.toLocaleString()}
                     </p>
                   </div>
                   <button
-                    onClick={() => eliminarPago(pago.id, pago.alumno?.nombre_completo || "este alumno")}
+                    onClick={() =>
+                      eliminarPago(
+                        pago.id,
+                        pago.alumno?.nombre_completo || "este alumno"
+                      )
+                    }
                     style={{
                       padding: "8px 16px",
                       background: "#dc2626",
@@ -397,68 +493,105 @@ export default function ProfesorDetallePage() {
         </div>
 
         {/* Lista de Alumnos */}
-        <div style={{
-          background: "white",
-          padding: "30px",
-          borderRadius: "12px",
-          boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-        }}>
-          <h2 style={{
-            margin: "0 0 20px 0",
-            fontSize: "20px",
-            fontWeight: "600",
-          }}>
+        <div
+          className="bg-gray-800 text-white"
+          style={{
+            padding: "30px",
+            borderRadius: "12px",
+            boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+          }}
+        >
+          <h2
+            style={{
+              margin: "0 0 20px 0",
+              fontSize: "20px",
+              fontWeight: "600",
+            }}
+          >
             👥 Alumnos ({profesor.alumnos.length})
           </h2>
 
           {profesor.alumnos.length === 0 ? (
-            <p style={{ textAlign: "center", color: "#666", padding: "40px 0" }}>
+            <p
+              className="text-gray-400"
+              style={{ textAlign: "center", padding: "40px 0" }}
+            >
               Este profesor aún no tiene alumnos asignados
             </p>
           ) : (
-            <div style={{
-              display: "grid",
-              gap: "12px",
-            }}>
+            <div
+              style={{
+                display: "grid",
+                gap: "12px",
+              }}
+            >
               {profesor.alumnos.map((alumno) => (
                 <div
                   key={alumno.id}
+                  className="bg-gray-700/50 border-gray-600"
                   style={{
                     display: "flex",
                     justifyContent: "space-between",
                     alignItems: "center",
                     padding: "16px",
-                    background: "#f9fafb",
                     borderRadius: "8px",
-                    border: "1px solid #e5e7eb",
+                    border: "1px solid",
                   }}
                 >
                   <div style={{ flex: 1 }}>
-                    <p style={{ margin: "0", fontWeight: "600", fontSize: "16px" }}>
+                    <p
+                      style={{
+                        margin: "0",
+                        fontWeight: "600",
+                        fontSize: "16px",
+                      }}
+                    >
                       {alumno.nombre}
                     </p>
-                    <p style={{ margin: "5px 0 0 0", fontSize: "14px", color: "#666" }}>
+                    <p
+                      className="text-gray-300"
+                      style={{
+                        margin: "5px 0 0 0",
+                        fontSize: "14px",
+                      }}
+                    >
                       @{alumno.username}
-                      {alumno.nombre_tutor && ` • Tutor: ${alumno.nombre_tutor}`}
+                      {alumno.nombre_tutor &&
+                        ` • Tutor: ${alumno.nombre_tutor}`}
                     </p>
                   </div>
                   <div style={{ textAlign: "right", marginRight: "20px" }}>
-                    <p style={{ margin: "0", fontWeight: "600", color: "#10b981", fontSize: "18px" }}>
+                    <p
+                      style={{
+                        margin: "0",
+                        fontWeight: "600",
+                        color: "#10b981",
+                        fontSize: "18px",
+                      }}
+                    >
                       ${alumno.mensualidad?.toLocaleString() || 0}
                     </p>
-                    <p style={{ margin: "5px 0 0 0", fontSize: "12px", color: "#666" }}>
+                    <p
+                      className="text-gray-400"
+                      style={{
+                        margin: "5px 0 0 0",
+                        fontSize: "12px",
+                      }}
+                    >
                       /mes
                     </p>
                   </div>
                   <div style={{ display: "flex", gap: "10px" }}>
                     <button
-                      onClick={() => setModalPago({
-                        alumnoId: alumno.id,
-                        alumnoNombre: alumno.nombre,
-                        monto: alumno.mensualidad || 0,
-                        fecha_pago: new Date().toISOString().split("T")[0],
-                        metodo_pago: "efectivo",
-                      })}
+                      onClick={() =>
+                        setModalPago({
+                          alumnoId: alumno.id,
+                          alumnoNombre: alumno.nombre,
+                          monto: alumno.mensualidad || 0,
+                          fecha_pago: new Date().toISOString().split("T")[0],
+                          metodo_pago: "efectivo",
+                        })
+                      }
                       style={{
                         padding: "8px 16px",
                         background: "#10b981",
@@ -496,70 +629,82 @@ export default function ProfesorDetallePage() {
 
       {/* Modal de Pago */}
       {modalPago && (
-        <div style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: "rgba(0,0,0,0.5)",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          zIndex: 1000,
-        }}>
-          <div style={{
-            background: "white",
-            padding: "30px",
-            borderRadius: "12px",
-            maxWidth: "400px",
-            width: "90%",
-          }}>
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: "rgba(0,0,0,0.5)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 1000,
+          }}
+        >
+          <div
+            className="bg-gray-800 text-white"
+            style={{
+              padding: "30px",
+              borderRadius: "12px",
+              maxWidth: "400px",
+              width: "90%",
+            }}
+          >
             <h2 style={{ margin: "0 0 20px 0", fontSize: "20px" }}>
               💵 Registrar Pago
             </h2>
 
             <div style={{ marginBottom: "20px" }}>
-              <p style={{ margin: "0 0 10px 0", color: "#666" }}>Alumno:</p>
+              <p className="text-gray-300" style={{ margin: "0 0 10px 0" }}>Alumno:</p>
               <p style={{ margin: "0", fontWeight: "600", fontSize: "18px" }}>
                 {modalPago.alumnoNombre}
               </p>
             </div>
 
             <div style={{ marginBottom: "20px" }}>
-              <p style={{ margin: "0 0 10px 0", color: "#666" }}>Fecha de Pago:</p>
+              <p className="text-gray-300" style={{ margin: "0 0 10px 0" }}>
+                Fecha de Pago:
+              </p>
               <input
                 type="date"
                 value={modalPago.fecha_pago}
-                onChange={(e) => setModalPago({
-                  ...modalPago,
-                  fecha_pago: e.target.value,
-                })}
+                onChange={(e) =>
+                  setModalPago({
+                    ...modalPago,
+                    fecha_pago: e.target.value,
+                  })
+                }
+                className="bg-gray-700 text-white border-gray-600"
                 style={{
                   width: "100%",
                   padding: "12px",
                   fontSize: "16px",
-                  border: "2px solid #e5e7eb",
+                  border: "2px solid",
                   borderRadius: "8px",
                 }}
               />
             </div>
 
             <div style={{ marginBottom: "20px" }}>
-              <p style={{ margin: "0 0 10px 0", color: "#666" }}>Monto:</p>
+              <p className="text-gray-300" style={{ margin: "0 0 10px 0" }}>Monto:</p>
               <input
                 type="number"
                 value={modalPago.monto}
-                onChange={(e) => setModalPago({
-                  ...modalPago,
-                  monto: parseFloat(e.target.value) || 0,
-                })}
+                onChange={(e) =>
+                  setModalPago({
+                    ...modalPago,
+                    monto: parseFloat(e.target.value) || 0,
+                  })
+                }
+                className="bg-gray-700 border-gray-600"
                 style={{
                   width: "100%",
                   padding: "12px",
                   fontSize: "24px",
                   fontWeight: "bold",
-                  border: "2px solid #e5e7eb",
+                  border: "2px solid",
                   borderRadius: "8px",
                   color: "#10b981",
                 }}
@@ -567,18 +712,23 @@ export default function ProfesorDetallePage() {
             </div>
 
             <div style={{ marginBottom: "20px" }}>
-              <p style={{ margin: "0 0 10px 0", color: "#666" }}>Método de Pago:</p>
+              <p className="text-gray-300" style={{ margin: "0 0 10px 0" }}>
+                Método de Pago:
+              </p>
               <select
                 value={modalPago.metodo_pago}
-                onChange={(e) => setModalPago({
-                  ...modalPago,
-                  metodo_pago: e.target.value,
-                })}
+                onChange={(e) =>
+                  setModalPago({
+                    ...modalPago,
+                    metodo_pago: e.target.value,
+                  })
+                }
+                className="bg-gray-700 text-white border-gray-600"
                 style={{
                   width: "100%",
                   padding: "12px",
                   fontSize: "16px",
-                  border: "2px solid #e5e7eb",
+                  border: "2px solid",
                   borderRadius: "8px",
                 }}
               >
@@ -589,14 +739,20 @@ export default function ProfesorDetallePage() {
               </select>
             </div>
 
-            <div style={{
-              padding: "12px",
-              background: "#f9fafb",
-              borderRadius: "8px",
-              marginBottom: "20px",
-            }}>
-              <p style={{ margin: "0", fontSize: "14px", color: "#666" }}>
-                Periodo: {new Date().toLocaleString('es-ES', { month: 'long', year: 'numeric' })}
+            <div
+              className="bg-gray-700/50"
+              style={{
+                padding: "12px",
+                borderRadius: "8px",
+                marginBottom: "20px",
+              }}
+            >
+              <p className="text-gray-300" style={{ margin: "0", fontSize: "14px" }}>
+                Periodo:{" "}
+                {new Date().toLocaleString("es-ES", {
+                  month: "long",
+                  year: "numeric",
+                })}
               </p>
             </div>
 
@@ -604,11 +760,11 @@ export default function ProfesorDetallePage() {
               <button
                 onClick={() => setModalPago(null)}
                 disabled={procesandoPago}
+                className="bg-gray-600 border-gray-500 text-white hover:bg-gray-500"
                 style={{
                   flex: 1,
                   padding: "12px",
-                  background: "#f3f4f6",
-                  border: "1px solid #d1d5db",
+                  border: "1px solid",
                   borderRadius: "8px",
                   cursor: procesandoPago ? "not-allowed" : "pointer",
                   fontWeight: "600",
@@ -641,48 +797,55 @@ export default function ProfesorDetallePage() {
 
       {/* Modal de Cambiar Contraseña */}
       {modalPassword && (
-        <div style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: "rgba(0,0,0,0.5)",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          zIndex: 1000,
-        }}>
-          <div style={{
-            background: "white",
-            padding: "30px",
-            borderRadius: "12px",
-            maxWidth: "400px",
-            width: "90%",
-          }}>
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: "rgba(0,0,0,0.5)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 1000,
+          }}
+        >
+          <div
+            className="bg-gray-800 text-white"
+            style={{
+              padding: "30px",
+              borderRadius: "12px",
+              maxWidth: "400px",
+              width: "90%",
+            }}
+          >
             <h2 style={{ margin: "0 0 20px 0", fontSize: "20px" }}>
               🔑 Cambiar Contraseña
             </h2>
 
             <div style={{ marginBottom: "20px" }}>
-              <p style={{ margin: "0 0 10px 0", color: "#666" }}>Profesor:</p>
+              <p className="text-gray-300" style={{ margin: "0 0 10px 0" }}>Profesor:</p>
               <p style={{ margin: "0", fontWeight: "600", fontSize: "18px" }}>
                 {profesor?.nombre}
               </p>
             </div>
 
             <div style={{ marginBottom: "20px" }}>
-              <p style={{ margin: "0 0 10px 0", color: "#666" }}>Nueva Contraseña:</p>
+              <p className="text-gray-300" style={{ margin: "0 0 10px 0" }}>
+                Nueva Contraseña:
+              </p>
               <input
                 type="password"
                 placeholder="Mínimo 6 caracteres"
                 value={nuevaPassword}
                 onChange={(e) => setNuevaPassword(e.target.value)}
+                className="bg-gray-700 text-white border-gray-600 placeholder-gray-400"
                 style={{
                   width: "100%",
                   padding: "12px",
                   fontSize: "16px",
-                  border: "2px solid #e5e7eb",
+                  border: "2px solid",
                   borderRadius: "8px",
                 }}
               />
@@ -695,11 +858,11 @@ export default function ProfesorDetallePage() {
                   setNuevaPassword("");
                 }}
                 disabled={cambiandoPassword}
+                className="bg-gray-600 border-gray-500 text-white hover:bg-gray-500"
                 style={{
                   flex: 1,
                   padding: "12px",
-                  background: "#f3f4f6",
-                  border: "1px solid #d1d5db",
+                  border: "1px solid",
                   borderRadius: "8px",
                   cursor: cambiandoPassword ? "not-allowed" : "pointer",
                   fontWeight: "600",

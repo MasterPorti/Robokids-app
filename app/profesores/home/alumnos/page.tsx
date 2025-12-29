@@ -156,14 +156,14 @@ export default function AlumnosPage() {
 
   if (loading) {
     return (
-      <div className="p-10 text-center">
+      <div className="p-10 text-center bg-black text-white min-h-screen">
         <p className="text-lg">Cargando alumnos...</p>
       </div>
     );
   }
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
+    <div className="p-6 max-w-7xl mx-auto bg-black text-white min-h-screen">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Mis Alumnos</h1>
         <div className="flex gap-3">
@@ -175,7 +175,7 @@ export default function AlumnosPage() {
           </button>
           <button
             onClick={() => router.push("/profesores/home")}
-            className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
+            className="px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-600"
           >
             Volver
           </button>
@@ -189,19 +189,19 @@ export default function AlumnosPage() {
           placeholder="Buscar por nombre, usuario o tutor..."
           value={busqueda}
           onChange={(e) => setBusqueda(e.target.value)}
-          className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full p-3 bg-gray-800 border border-gray-600 text-white placeholder-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
 
       {/* Estadísticas */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-          <p className="text-sm text-gray-600">Total de Alumnos</p>
-          <p className="text-3xl font-bold text-blue-600">{alumnos.length}</p>
+        <div className="bg-blue-900/30 p-4 rounded-lg border border-blue-600">
+          <p className="text-sm text-gray-300">Total de Alumnos</p>
+          <p className="text-3xl font-bold text-blue-400">{alumnos.length}</p>
         </div>
-        <div className="bg-green-50 p-4 rounded-lg border border-green-200">
-          <p className="text-sm text-gray-600">Inscritos este mes</p>
-          <p className="text-3xl font-bold text-green-600">
+        <div className="bg-green-900/30 p-4 rounded-lg border border-green-600">
+          <p className="text-sm text-gray-300">Inscritos este mes</p>
+          <p className="text-3xl font-bold text-green-400">
             {
               alumnos.filter((a) => {
                 const fecha = new Date(a.fecha_inscripcion);
@@ -214,9 +214,9 @@ export default function AlumnosPage() {
             }
           </p>
         </div>
-        <div className="bg-purple-50 p-4 rounded-lg border border-purple-200">
-          <p className="text-sm text-gray-600">Resultados de búsqueda</p>
-          <p className="text-3xl font-bold text-purple-600">
+        <div className="bg-purple-900/30 p-4 rounded-lg border border-purple-600">
+          <p className="text-sm text-gray-300">Resultados de búsqueda</p>
+          <p className="text-3xl font-bold text-purple-400">
             {alumnosFiltrados.length}
           </p>
         </div>
@@ -224,60 +224,60 @@ export default function AlumnosPage() {
 
       {/* Tabla de alumnos */}
       {alumnosFiltrados.length === 0 ? (
-        <div className="text-center py-12 bg-gray-50 rounded-lg">
-          <p className="text-gray-500 text-lg">
+        <div className="text-center py-12 bg-gray-800 rounded-lg">
+          <p className="text-gray-400 text-lg">
             {busqueda
               ? "No se encontraron alumnos con esa búsqueda"
               : "No tienes alumnos inscritos aún"}
           </p>
         </div>
       ) : (
-        <div className="overflow-x-auto bg-white rounded-lg shadow">
+        <div className="overflow-x-auto bg-gray-800 rounded-lg shadow">
           <table className="w-full">
-            <thead className="bg-gray-100 border-b">
+            <thead className="bg-gray-900 border-b border-gray-700">
               <tr>
-                <th className="text-left p-4 font-semibold">Alumno</th>
-                <th className="text-left p-4 font-semibold">Usuario</th>
-                <th className="text-left p-4 font-semibold">Tutor</th>
-                <th className="text-left p-4 font-semibold">Teléfono</th>
-                <th className="text-left p-4 font-semibold">Inscripción</th>
-                <th className="text-left p-4 font-semibold">Día Pago</th>
-                <th className="text-left p-4 font-semibold">Mensualidad</th>
-                <th className="text-left p-4 font-semibold">Estado</th>
-                <th className="text-center p-4 font-semibold">Acciones</th>
+                <th className="text-left p-4 font-semibold text-gray-200">Alumno</th>
+                <th className="text-left p-4 font-semibold text-gray-200">Usuario</th>
+                <th className="text-left p-4 font-semibold text-gray-200">Tutor</th>
+                <th className="text-left p-4 font-semibold text-gray-200">Teléfono</th>
+                <th className="text-left p-4 font-semibold text-gray-200">Inscripción</th>
+                <th className="text-left p-4 font-semibold text-gray-200">Día Pago</th>
+                <th className="text-left p-4 font-semibold text-gray-200">Mensualidad</th>
+                <th className="text-left p-4 font-semibold text-gray-200">Estado</th>
+                <th className="text-center p-4 font-semibold text-gray-200">Acciones</th>
               </tr>
             </thead>
             <tbody>
               {alumnosFiltrados.map((alumno) => (
-                <tr key={alumno.id} className="border-b hover:bg-gray-50">
+                <tr key={alumno.id} className="border-b border-gray-700 hover:bg-gray-700">
                   <td className="p-4">
-                    <p className="font-semibold">{alumno.nombre_completo}</p>
+                    <p className="font-semibold text-white">{alumno.nombre_completo}</p>
                   </td>
                   <td className="p-4">
-                    <code className="bg-gray-100 px-2 py-1 rounded text-sm">
+                    <code className="bg-gray-700 px-2 py-1 rounded text-sm text-gray-200">
                       {alumno.username}
                     </code>
                   </td>
-                  <td className="p-4">{alumno.nombre_tutor}</td>
-                  <td className="p-4">{alumno.telefono_tutor}</td>
-                  <td className="p-4">
+                  <td className="p-4 text-gray-300">{alumno.nombre_tutor}</td>
+                  <td className="p-4 text-gray-300">{alumno.telefono_tutor}</td>
+                  <td className="p-4 text-gray-300">
                     {new Date(alumno.fecha_inscripcion).toLocaleDateString(
                       "es-ES"
                     )}
                   </td>
-                  <td className="p-4">Día {alumno.dia_pago}</td>
+                  <td className="p-4 text-gray-300">Día {alumno.dia_pago}</td>
                   <td className="p-4">
-                    <span className="font-semibold text-green-600">
+                    <span className="font-semibold text-green-400">
                       ${alumno.mensualidad?.toFixed(2) || "0.00"}
                     </span>
                   </td>
                   <td className="p-4">
                     {alumno.activo ? (
-                      <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
+                      <span className="px-2 py-1 bg-green-900/50 text-green-300 text-xs rounded-full border border-green-600">
                         Activo
                       </span>
                     ) : (
-                      <span className="px-2 py-1 bg-gray-100 text-gray-800 text-xs rounded-full">
+                      <span className="px-2 py-1 bg-gray-700 text-gray-300 text-xs rounded-full border border-gray-600">
                         Inactivo
                       </span>
                     )}

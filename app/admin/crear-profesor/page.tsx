@@ -60,23 +60,21 @@ export default function CrearProfesorPage() {
 
   return (
     <div
+      className="bg-black"
       style={{
         padding: "40px 20px",
         maxWidth: "600px",
         margin: "0 auto",
         fontFamily: "system-ui, -apple-system, sans-serif",
-        background: "#f9fafb",
         minHeight: "100vh",
       }}
     >
-      <div style={{
-        background: "white",
+      <div className="bg-gray-800 text-white" style={{
         padding: "30px",
         borderRadius: "12px",
         boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
       }}>
-        <Link href="/admin" style={{
-          color: "#2563eb",
+        <Link href="/admin" className="text-blue-500 hover:text-blue-400" style={{
           textDecoration: "none",
           fontSize: "14px",
           display: "inline-flex",
@@ -89,12 +87,10 @@ export default function CrearProfesorPage() {
         <h1 style={{
           margin: "20px 0 10px 0",
           fontSize: "28px",
-          color: "#111",
         }}>
           👨‍🏫 Crear Nuevo Profesor
         </h1>
-        <p style={{
-          color: "#666",
+        <p className="text-gray-400" style={{
           margin: "0 0 20px 0",
           fontSize: "14px",
         }}>
@@ -113,7 +109,8 @@ export default function CrearProfesorPage() {
             required
             value={formData.nombreCompleto}
             onChange={(e) => setFormData({ ...formData, nombreCompleto: e.target.value })}
-            style={{ width: "100%", padding: "10px", marginTop: "5px", border: "1px solid #ccc", borderRadius: "4px" }}
+            className="bg-gray-700 text-white border-gray-600 placeholder-gray-400"
+            style={{ width: "100%", padding: "10px", marginTop: "5px", border: "1px solid", borderRadius: "4px" }}
           />
         </div>
 
@@ -125,9 +122,10 @@ export default function CrearProfesorPage() {
             required
             value={formData.usuario}
             onChange={(e) => setFormData({ ...formData, usuario: e.target.value })}
-            style={{ width: "100%", padding: "10px", marginTop: "5px", border: "1px solid #ccc", borderRadius: "4px" }}
+            className="bg-gray-700 text-white border-gray-600 placeholder-gray-400"
+            style={{ width: "100%", padding: "10px", marginTop: "5px", border: "1px solid", borderRadius: "4px" }}
           />
-          <small style={{ color: "#666", fontSize: "12px" }}>
+          <small className="text-gray-400" style={{ fontSize: "12px" }}>
             Este será el usuario para iniciar sesión
           </small>
         </div>
@@ -141,7 +139,8 @@ export default function CrearProfesorPage() {
             minLength={6}
             value={formData.password}
             onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-            style={{ width: "100%", padding: "10px", marginTop: "5px", border: "1px solid #ccc", borderRadius: "4px" }}
+            className="bg-gray-700 text-white border-gray-600 placeholder-gray-400"
+            style={{ width: "100%", padding: "10px", marginTop: "5px", border: "1px solid", borderRadius: "4px" }}
           />
         </div>
 
@@ -152,9 +151,10 @@ export default function CrearProfesorPage() {
             placeholder="correo@ejemplo.com (opcional)"
             value={formData.email}
             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-            style={{ width: "100%", padding: "10px", marginTop: "5px", border: "1px solid #ccc", borderRadius: "4px" }}
+            className="bg-gray-700 text-white border-gray-600 placeholder-gray-400"
+            style={{ width: "100%", padding: "10px", marginTop: "5px", border: "1px solid", borderRadius: "4px" }}
           />
-          <small style={{ color: "#666", fontSize: "12px" }}>
+          <small className="text-gray-400" style={{ fontSize: "12px" }}>
             Opcional. Si no se proporciona, se generará uno automático
           </small>
         </div>
@@ -167,7 +167,8 @@ export default function CrearProfesorPage() {
             required
             value={formData.telefono}
             onChange={(e) => setFormData({ ...formData, telefono: e.target.value })}
-            style={{ width: "100%", padding: "10px", marginTop: "5px", border: "1px solid #ccc", borderRadius: "4px" }}
+            className="bg-gray-700 text-white border-gray-600 placeholder-gray-400"
+            style={{ width: "100%", padding: "10px", marginTop: "5px", border: "1px solid", borderRadius: "4px" }}
           />
         </div>
 
@@ -194,8 +195,8 @@ export default function CrearProfesorPage() {
           fontWeight: "bold",
           padding: "12px",
           borderRadius: "6px",
-          background: mensaje.includes("✅") ? "#d1fae5" : "#fee2e2",
-          color: mensaje.includes("✅") ? "#065f46" : "#991b1b",
+          background: mensaje.includes("✅") ? "#064e3b" : "#7f1d1d",
+          color: mensaje.includes("✅") ? "#34d399" : "#fca5a5",
         }}>
           {mensaje}
         </p>

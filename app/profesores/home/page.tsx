@@ -90,15 +90,43 @@ export default function HomeProfesores() {
     }
   }
 
-  if (loading) return <div style={{ padding: "50px" }}>Cargando panel...</div>;
+  if (loading) {
+    return (
+      <div className="bg-black text-white" style={{ padding: "40px", minHeight: "100vh" }}>
+        <div style={{ maxWidth: "1400px", margin: "0 auto" }}>
+          {/* Header Skeleton */}
+          <div style={{ marginBottom: "30px" }}>
+            <div className="animate-pulse bg-gray-800 h-8 w-64 rounded mb-2"></div>
+            <div className="animate-pulse bg-gray-700 h-4 w-96 rounded"></div>
+          </div>
+
+          {/* Stats Skeleton */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: "20px", marginBottom: "30px" }}>
+            <div className="animate-pulse bg-gradient-to-br from-purple-900 to-purple-800 h-32 rounded-lg"></div>
+            <div className="animate-pulse bg-gradient-to-br from-red-900 to-red-800 h-32 rounded-lg"></div>
+          </div>
+
+          {/* Title Skeleton */}
+          <div className="animate-pulse bg-gray-800 h-6 w-48 rounded mb-5"></div>
+
+          {/* Cards Skeleton */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "20px" }}>
+            <div className="animate-pulse bg-gray-800 h-48 rounded-lg"></div>
+            <div className="animate-pulse bg-gray-800 h-48 rounded-lg"></div>
+            <div className="animate-pulse bg-gray-800 h-48 rounded-lg"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div style={{ padding: "40px" }}>
+    <div className="bg-black text-white" style={{ padding: "40px", minHeight: "100vh" }}>
       <div
         style={{
           display: "flex",
           justifyContent: "space-between",
-          borderBottom: "1px solid #ccc",
+          borderBottom: "1px solid #444",
           paddingBottom: "20px",
         }}
       >
@@ -197,9 +225,9 @@ export default function HomeProfesores() {
           {/* Ver Alumnos */}
           <div
             onClick={() => router.push("/profesores/home/alumnos")}
+            className="bg-gray-800 text-white"
             style={{
-              background: "white",
-              border: "2px solid #e0e0e0",
+              border: "2px solid #374151",
               borderRadius: "10px",
               padding: "25px",
               cursor: "pointer",
@@ -209,10 +237,10 @@ export default function HomeProfesores() {
               e.currentTarget.style.borderColor = "#3b82f6";
               e.currentTarget.style.transform = "translateY(-2px)";
               e.currentTarget.style.boxShadow =
-                "0 4px 12px rgba(59,130,246,0.2)";
+                "0 4px 12px rgba(59,130,246,0.3)";
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = "#e0e0e0";
+              e.currentTarget.style.borderColor = "#374151";
               e.currentTarget.style.transform = "translateY(0)";
               e.currentTarget.style.boxShadow = "none";
             }}
@@ -221,7 +249,7 @@ export default function HomeProfesores() {
             <h3 style={{ fontSize: "20px", marginBottom: "10px" }}>
               Ver Mis Alumnos
             </h3>
-            <p style={{ color: "#666", fontSize: "14px" }}>
+            <p className="text-gray-400" style={{ fontSize: "14px" }}>
               Consulta, edita y gestiona a todos tus alumnos inscritos
             </p>
           </div>
@@ -229,9 +257,9 @@ export default function HomeProfesores() {
           {/* Inscribir Nuevo */}
           <div
             onClick={() => router.push("/profesores/home/crear-alumno")}
+            className="bg-gray-800 text-white"
             style={{
-              background: "white",
-              border: "2px solid #e0e0e0",
+              border: "2px solid #374151",
               borderRadius: "10px",
               padding: "25px",
               cursor: "pointer",
@@ -241,10 +269,10 @@ export default function HomeProfesores() {
               e.currentTarget.style.borderColor = "#10b981";
               e.currentTarget.style.transform = "translateY(-2px)";
               e.currentTarget.style.boxShadow =
-                "0 4px 12px rgba(16,185,129,0.2)";
+                "0 4px 12px rgba(16,185,129,0.3)";
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = "#e0e0e0";
+              e.currentTarget.style.borderColor = "#374151";
               e.currentTarget.style.transform = "translateY(0)";
               e.currentTarget.style.boxShadow = "none";
             }}
@@ -253,7 +281,7 @@ export default function HomeProfesores() {
             <h3 style={{ fontSize: "20px", marginBottom: "10px" }}>
               Inscribir Nuevo Alumno
             </h3>
-            <p style={{ color: "#666", fontSize: "14px" }}>
+            <p className="text-gray-400" style={{ fontSize: "14px" }}>
               Registra un nuevo estudiante y genera sus credenciales
             </p>
           </div>
@@ -261,9 +289,9 @@ export default function HomeProfesores() {
           {/* Gestión de Pagos */}
           <div
             onClick={() => router.push("/profesores/home/pagos")}
+            className="bg-gray-800 text-white"
             style={{
-              background: "white",
-              border: "2px solid #e0e0e0",
+              border: "2px solid #374151",
               borderRadius: "10px",
               padding: "25px",
               cursor: "pointer",
@@ -273,10 +301,10 @@ export default function HomeProfesores() {
               e.currentTarget.style.borderColor = "#a855f7";
               e.currentTarget.style.transform = "translateY(-2px)";
               e.currentTarget.style.boxShadow =
-                "0 4px 12px rgba(168,85,247,0.2)";
+                "0 4px 12px rgba(168,85,247,0.3)";
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = "#e0e0e0";
+              e.currentTarget.style.borderColor = "#374151";
               e.currentTarget.style.transform = "translateY(0)";
               e.currentTarget.style.boxShadow = "none";
             }}
@@ -285,7 +313,7 @@ export default function HomeProfesores() {
             <h3 style={{ fontSize: "20px", marginBottom: "10px" }}>
               Gestión de Pagos
             </h3>
-            <p style={{ color: "#666", fontSize: "14px" }}>
+            <p className="text-gray-400" style={{ fontSize: "14px" }}>
               Registra pagos mensuales y consulta el estado de cobros
             </p>
           </div>

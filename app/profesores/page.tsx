@@ -37,18 +37,20 @@ export default function LoginProfesores() {
         justifyContent: "center",
         alignItems: "center",
         fontFamily: "sans-serif",
+        background: "#000",
       }}
     >
       <div
         style={{
-          border: "1px solid #ddd",
+          border: "1px solid #333",
           padding: "40px",
           borderRadius: "10px",
           width: "320px",
-          boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
+          boxShadow: "0 4px 6px rgba(255,255,255,0.1)",
+          background: "#1a1a1a",
         }}
       >
-        <h2 style={{ textAlign: "center", marginBottom: "20px" }}>
+        <h2 style={{ textAlign: "center", marginBottom: "20px", color: "#fff" }}>
           Acceso Profesores
         </h2>
 
@@ -63,8 +65,10 @@ export default function LoginProfesores() {
             onChange={(e) => setUsuario(e.target.value)}
             style={{
               padding: "12px",
-              border: "1px solid #ccc",
+              border: "1px solid #333",
               borderRadius: "4px",
+              background: "#0a0a0a",
+              color: "#fff",
             }}
           />
           <input
@@ -74,16 +78,18 @@ export default function LoginProfesores() {
             onChange={(e) => setPassword(e.target.value)}
             style={{
               padding: "12px",
-              border: "1px solid #ccc",
+              border: "1px solid #333",
               borderRadius: "4px",
+              background: "#0a0a0a",
+              color: "#fff",
             }}
           />
           <button
             type="submit"
             style={{
               padding: "12px",
-              background: "#0070f3",
-              color: "white",
+              background: "#fff",
+              color: "#000",
               border: "none",
               borderRadius: "4px",
               cursor: "pointer",
@@ -95,7 +101,7 @@ export default function LoginProfesores() {
         </form>
 
         {errorMsg && (
-          <p style={{ color: "red", marginTop: "15px", textAlign: "center" }}>
+          <p style={{ color: "#ef4444", marginTop: "15px", textAlign: "center" }}>
             {errorMsg}
           </p>
         )}

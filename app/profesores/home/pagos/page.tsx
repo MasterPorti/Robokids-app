@@ -213,20 +213,20 @@ export default function GestionPagosPage() {
 
   // -- RENDER --
   return (
-    <div className="min-h-screen bg-slate-50 p-6 md:p-10 font-sans">
+    <div className="min-h-screen bg-black text-white p-6 md:p-10 font-sans">
       {/* HEADER */}
       <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-slate-800">
+          <h1 className="text-3xl font-bold text-white">
             Gestión de Pagos
           </h1>
-          <p className="text-slate-500">
+          <p className="text-gray-400">
             Administra los cobros mensuales de tus alumnos
           </p>
         </div>
-        <div className="flex gap-4 items-center bg-white p-2 rounded-xl shadow-sm border border-slate-100">
+        <div className="flex gap-4 items-center bg-gray-800 p-2 rounded-xl shadow-sm border border-gray-700">
           <select
-            className="bg-transparent font-medium text-slate-700 outline-none cursor-pointer"
+            className="bg-gray-700 font-medium text-white outline-none cursor-pointer px-2 py-1 rounded"
             value={mes}
             onChange={(e) => setMes(Number(e.target.value))}
           >
@@ -238,14 +238,14 @@ export default function GestionPagosPage() {
           </select>
           <input
             type="number"
-            className="w-20 bg-transparent font-medium text-slate-700 outline-none border-b border-slate-200"
+            className="w-20 bg-gray-700 font-medium text-white outline-none border-b border-gray-600 px-2 py-1 rounded"
             value={anio}
             onChange={(e) => setAnio(Number(e.target.value))}
           />
         </div>
         <Link
           href="/profesores/home"
-          className="px-4 py-2 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 transition-colors font-medium"
+          className="px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors font-medium"
         >
           Volver
         </Link>
@@ -274,35 +274,35 @@ export default function GestionPagosPage() {
       </div>
 
       {loading ? (
-        <div className="text-center py-20 text-slate-400">
+        <div className="text-center py-20 text-gray-400">
           Cargando datos...
         </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* COLUMNA PENDIENTES */}
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-            <div className="bg-orange-50 p-4 border-b border-orange-100 flex justify-between items-center">
-              <h2 className="font-bold text-orange-800">Pendientes de Pago</h2>
-              <span className="bg-orange-200 text-orange-800 text-xs px-2 py-1 rounded-full font-bold">
+          <div className="bg-gray-800 rounded-2xl shadow-sm border border-gray-700 overflow-hidden">
+            <div className="bg-orange-900/30 p-4 border-b border-orange-600 flex justify-between items-center">
+              <h2 className="font-bold text-orange-400">Pendientes de Pago</h2>
+              <span className="bg-orange-600 text-white text-xs px-2 py-1 rounded-full font-bold">
                 {listaPendientes.length}
               </span>
             </div>
             <div className="p-4 flex flex-col gap-3 min-h-[300px]">
               {listaPendientes.length === 0 ? (
-                <div className="text-center py-10 text-slate-400 italic">
+                <div className="text-center py-10 text-gray-400 italic">
                   ¡Todos han pagado! 🎉
                 </div>
               ) : (
                 listaPendientes.map((alumno) => (
                   <div
                     key={alumno.id}
-                    className="flex justify-between items-center p-3 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors border border-slate-100"
+                    className="flex justify-between items-center p-3 bg-gray-700 rounded-xl hover:bg-gray-600 transition-colors border border-gray-600"
                   >
                     <div>
-                      <Link href={`/profesores/home/alumnos/${alumno.id}`} className="font-semibold text-slate-700 hover:text-purple-600 hover:underline">
+                      <Link href={`/profesores/home/alumnos/${alumno.id}`} className="font-semibold text-white hover:text-purple-400 hover:underline">
                         {alumno.nombre_completo}
                       </Link>
-                      <p className="text-sm text-slate-500">
+                      <p className="text-sm text-gray-300">
                         Debe: {formatCurrency(alumno.mensualidad)}
                       </p>
                     </div>
@@ -319,31 +319,31 @@ export default function GestionPagosPage() {
           </div>
 
           {/* COLUMNA PAGADOS */}
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-            <div className="bg-emerald-50 p-4 border-b border-emerald-100 flex justify-between items-center">
-              <h2 className="font-bold text-emerald-800">Pagos Registrados</h2>
-              <span className="bg-emerald-200 text-emerald-800 text-xs px-2 py-1 rounded-full font-bold">
+          <div className="bg-gray-800 rounded-2xl shadow-sm border border-gray-700 overflow-hidden">
+            <div className="bg-green-900/30 p-4 border-b border-green-600 flex justify-between items-center">
+              <h2 className="font-bold text-green-400">Pagos Registrados</h2>
+              <span className="bg-green-600 text-white text-xs px-2 py-1 rounded-full font-bold">
                 {listaPagados.length}
               </span>
             </div>
             <div className="p-4 flex flex-col gap-3 min-h-[300px]">
               {listaPagados.length === 0 ? (
-                <div className="text-center py-10 text-slate-400 italic">
+                <div className="text-center py-10 text-gray-400 italic">
                   No hay pagos registrados aún
                 </div>
               ) : (
                 listaPagados.map((item) => (
                   <div
                     key={item.id}
-                    className="flex justify-between items-center p-3 bg-emerald-50/50 rounded-xl border border-emerald-100/50"
+                    className="flex justify-between items-center p-3 bg-green-900/20 rounded-xl border border-green-700/50"
                   >
                     <div>
-                      <h3 className="font-semibold text-slate-700">
-                        <Link href={`/profesores/home/alumnos/${item.id}`} className="hover:text-purple-600 hover:underline">
+                      <h3 className="font-semibold text-white">
+                        <Link href={`/profesores/home/alumnos/${item.id}`} className="hover:text-purple-400 hover:underline">
                           {item.nombre_completo}
                         </Link>
                       </h3>
-                      <div className="flex gap-2 text-xs text-slate-500">
+                      <div className="flex gap-2 text-xs text-gray-300">
                         <span>{formatCurrency(item.pago?.monto || 0)}</span>
                         <span>•</span>
                         <span>
@@ -358,7 +358,7 @@ export default function GestionPagosPage() {
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="px-2 py-1 bg-emerald-100 text-emerald-700 text-xs rounded-md font-bold">
+                      <span className="px-2 py-1 bg-green-600 text-white text-xs rounded-md font-bold">
                         Pagado
                       </span>
                       {item.pago && (
@@ -376,7 +376,7 @@ export default function GestionPagosPage() {
                               anio: nextAnio,
                             });
                           }}
-                          className="p-1 px-2 text-blue-500 hover:bg-blue-50 rounded-md transition-colors text-xs font-bold border border-blue-100"
+                          className="p-1 px-2 text-blue-400 hover:bg-blue-900/30 rounded-md transition-colors text-xs font-bold border border-blue-600"
                           title={`Adelantar pago de ${
                             months[((mes % 12) + 12) % 12] || "Siguiente Mes"
                           }`}
@@ -396,10 +396,10 @@ export default function GestionPagosPage() {
       {/* MODAL */}
       {modalOpen && selectedAlumno && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 animate-in fade-in zoom-in duration-200">
-            <h2 className="text-xl font-bold text-slate-800 mb-4">
+          <div className="bg-gray-800 rounded-2xl shadow-xl max-w-md w-full p-6 animate-in fade-in zoom-in duration-200 border border-gray-700">
+            <h2 className="text-xl font-bold text-white mb-4">
               Registrar Pago:{" "}
-              <span className="text-purple-600">
+              <span className="text-purple-400">
                 {selectedAlumno.nombre_completo}
               </span>
             </h2>
@@ -410,31 +410,31 @@ export default function GestionPagosPage() {
             >
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-slate-500 mb-1">
+                  <label className="block text-xs font-bold text-gray-400 mb-1">
                     MES PAGO
                   </label>
-                  <div className="w-full p-2 bg-slate-100 rounded-lg text-slate-700 font-medium">
+                  <div className="w-full p-2 bg-gray-700 rounded-lg text-white font-medium">
                     {months[modalPeriod.mes - 1]}
                   </div>
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-slate-500 mb-1">
+                  <label className="block text-xs font-bold text-gray-400 mb-1">
                     AÑO
                   </label>
-                  <div className="w-full p-2 bg-slate-100 rounded-lg text-slate-700 font-medium">
+                  <div className="w-full p-2 bg-gray-700 rounded-lg text-white font-medium">
                     {modalPeriod.anio}
                   </div>
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-500 mb-1">
+                <label className="block text-xs font-bold text-gray-400 mb-1">
                   FECHA DE PAGO
                 </label>
                 <input
                   type="date"
                   required
-                  className="w-full p-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-purple-500 outline-none"
+                  className="w-full p-2 border border-gray-600 bg-gray-700 text-white rounded-lg focus:ring-2 focus:ring-purple-500 outline-none"
                   value={formData.fecha_pago}
                   onChange={(e) =>
                     setFormData({ ...formData, fecha_pago: e.target.value })
@@ -443,7 +443,7 @@ export default function GestionPagosPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-500 mb-1">
+                <label className="block text-xs font-bold text-gray-400 mb-1">
                   MONTO
                 </label>
                 <input
@@ -451,7 +451,7 @@ export default function GestionPagosPage() {
                   required
                   min="0"
                   step="0.01"
-                  className="w-full p-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-purple-500 outline-none"
+                  className="w-full p-2 border border-gray-600 bg-gray-700 text-white rounded-lg focus:ring-2 focus:ring-purple-500 outline-none"
                   value={formData.monto}
                   onChange={(e) =>
                     setFormData({ ...formData, monto: Number(e.target.value) })
@@ -460,11 +460,11 @@ export default function GestionPagosPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-500 mb-1">
+                <label className="block text-xs font-bold text-gray-400 mb-1">
                   MÉTODO DE PAGO
                 </label>
                 <select
-                  className="w-full p-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-purple-500 outline-none"
+                  className="w-full p-2 border border-gray-600 bg-gray-700 text-white rounded-lg focus:ring-2 focus:ring-purple-500 outline-none"
                   value={formData.metodo_pago}
                   onChange={(e) =>
                     setFormData({ ...formData, metodo_pago: e.target.value })
@@ -478,11 +478,11 @@ export default function GestionPagosPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-500 mb-1">
+                <label className="block text-xs font-bold text-gray-400 mb-1">
                   NOTAS (OPCIONAL)
                 </label>
                 <textarea
-                  className="w-full p-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-purple-500 outline-none resize-none h-20"
+                  className="w-full p-2 border border-gray-600 bg-gray-700 text-white placeholder-gray-400 rounded-lg focus:ring-2 focus:ring-purple-500 outline-none resize-none h-20"
                   value={formData.notas}
                   onChange={(e) =>
                     setFormData({ ...formData, notas: e.target.value })
@@ -495,14 +495,14 @@ export default function GestionPagosPage() {
                 <button
                   type="button"
                   onClick={() => setModalOpen(false)}
-                  className="flex-1 py-2.5 text-slate-600 font-medium hover:bg-slate-100 rounded-xl transition-colors"
+                  className="flex-1 py-2.5 text-gray-300 font-medium hover:bg-gray-700 rounded-xl transition-colors border border-gray-600"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="flex-1 py-2.5 bg-purple-600 text-white font-bold rounded-xl hover:bg-purple-700 transition-shadow shadow-md shadow-purple-200 disabled:opacity-50"
+                  className="flex-1 py-2.5 bg-purple-600 text-white font-bold rounded-xl hover:bg-purple-700 transition-shadow shadow-md shadow-purple-900/50 disabled:opacity-50"
                 >
                   {submitting ? "Registrando..." : "Registrar Pago"}
                 </button>
@@ -527,10 +527,10 @@ function StatCard({
   color: string;
 }) {
   return (
-    <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-start justify-between hover:shadow-md transition-shadow">
+    <div className="bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-700 flex items-start justify-between hover:shadow-md transition-shadow">
       <div>
-        <p className="text-slate-500 text-sm font-medium mb-1">{title}</p>
-        <h3 className="text-2xl font-bold text-slate-800">{value}</h3>
+        <p className="text-gray-400 text-sm font-medium mb-1">{title}</p>
+        <h3 className="text-2xl font-bold text-white">{value}</h3>
       </div>
       <div className={`p-3 rounded-xl ${color} text-white shadow-sm`}>
         <span className="text-xl">{icon}</span>

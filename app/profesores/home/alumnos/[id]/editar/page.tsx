@@ -3,6 +3,7 @@
 import { useState, useEffect, FormEvent, ChangeEvent } from "react";
 import { supabase } from "@/lib/supabase";
 import { useRouter, useParams } from "next/navigation";
+import { Horario, SUCURSALES, Sucursal } from "@/lib/types";
 
 interface FormData {
   nombre_completo: string;
@@ -12,6 +13,8 @@ interface FormData {
   fecha_inscripcion: string;
   mensualidad: string;
   activo: boolean;
+  sucursal: Sucursal;
+  horario_id: string;
 }
 
 interface Alumno extends FormData {
@@ -33,10 +36,13 @@ export default function EditarAlumno() {
     fecha_inscripcion: "",
     mensualidad: "0",
     activo: true,
+    sucursal: "Plaza Coacalco",
+    horario_id: "",
   });
   const [username, setUsername] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [horarios, setHorarios] = useState<Horario[]>([]);
 
   useEffect(() => {
     async function cargarAlumno() {
@@ -74,6 +80,8 @@ export default function EditarAlumno() {
           fecha_inscripcion: alumno.fecha_inscripcion,
           mensualidad: String(alumno.mensualidad || 0),
           activo: alumno.activo ?? true,
+          sucursal: alumno.sucursal || "Plaza Coacalco",
+          horario_id: alumno.horario_id || "",
         });
         setUsername(alumno.username);
       } catch (error) {
@@ -83,7 +91,20 @@ export default function EditarAlumno() {
       }
     }
 
+    async function cargarHorarios() {
+      try {
+        const res = await fetch("/api/horarios");
+        const data = await res.json();
+        if (data.success) {
+          setHorarios(data.horarios);
+        }
+      } catch (error) {
+        console.error("Error cargando horarios:", error);
+      }
+    }
+
     cargarAlumno();
+    cargarHorarios();
   }, [alumnoId, router]);
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
@@ -101,6 +122,8 @@ export default function EditarAlumno() {
           fecha_inscripcion: formData.fecha_inscripcion,
           mensualidad: parseFloat(formData.mensualidad),
           activo: formData.activo,
+          sucursal: formData.sucursal,
+          horario_id: formData.horario_id || null,
         })
         .eq("id", alumnoId);
 
@@ -231,6 +254,52 @@ export default function EditarAlumno() {
               }
               className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
+          </div>
+
+          <div>
+            <label className="block font-semibold mb-2">Sucursal:</label>
+            <select
+              value={formData.sucursal}
+              onChange={(e: ChangeEvent<HTMLSelectElement>) => {
+                const nuevaSucursal = e.target.value as Sucursal;
+                setFormData({ ...formData, sucursal: nuevaSucursal, horario_id: "" });
+              }}
+              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+            >
+              {SUCURSALES.map((s) => (
+                <option key={s} value={s}>
+                  {s}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block font-semibold mb-2">Horario (opcional):</label>
+            <select
+              value={formData.horario_id}
+              onChange={(e: ChangeEvent<HTMLSelectElement>) =>
+                setFormData({ ...formData, horario_id: e.target.value })
+              }
+              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+            >
+              <option value="">Sin horario asignado</option>
+              {horarios
+                .filter((h) => h.sucursal === formData.sucursal)
+                .map((h) => (
+                  <option key={h.id} value={h.id}>
+                    {h.dia_semana} {h.hora_inicio.substring(0, 5)} - {h.hora_fin.substring(0, 5)}
+                  </option>
+                ))}
+            </select>
+            {horarios.filter((h) => h.sucursal === formData.sucursal).length === 0 && (
+              <p className="text-sm text-gray-500 mt-1">
+                No hay horarios disponibles para esta sucursal.{" "}
+                <a href="/profesores/horarios" className="text-blue-600 hover:underline">
+                  Crear horario
+                </a>
+              </p>
+            )}
           </div>
 
           <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
