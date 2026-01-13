@@ -24,8 +24,9 @@ export const RETOS_REGISTRY: Record<string, RetoLoader> = {
     import("./contenido/modulo-1/nivel-1/reto-3-circuit").then((m) => m.reto),
 
   // MÓDULO 1 - NIVEL 2
-  "mod1-niv2-reto-1": () =>
-    import("./contenido/modulo-1/nivel-2/reto-1-question").then((m) => m.reto),
+  // TODO: Uncomment when nivel-2 content is created
+  // "mod1-niv2-reto-1": () =>
+  //   import("./contenido/modulo-1/nivel-2/reto-1-question").then((m) => m.reto),
 
   // NUEVO RETO - Ejemplo de cómo agregar contenido
   "mod1-lv1-ch4": () =>
