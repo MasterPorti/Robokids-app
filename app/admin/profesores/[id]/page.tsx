@@ -621,7 +621,7 @@ export default function ProfesorDetallePage() {
                       💵 Pagar
                     </button>
                     <Link
-                      href={`/profesores/home/alumnos/${alumno.id}`}
+                      href={`/admin/alumnos/${alumno.id}/editar`}
                       style={{
                         padding: "8px 16px",
                         background: "#2563eb",

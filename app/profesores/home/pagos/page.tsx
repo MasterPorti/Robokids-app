@@ -11,6 +11,7 @@ interface Alumno {
   nombre_completo: string;
   mensualidad: number;
   stripe_customer_id?: string | null;
+  dia_pago: number;
 }
 
 interface Pago {
@@ -60,6 +61,18 @@ export default function GestionPagosPage() {
     notas: "",
   });
   const [submitting, setSubmitting] = useState(false);
+
+  // -- HELPER FUNCTIONS --
+  const getPaymentStatus = (alumno: Alumno) => {
+    const today = new Date();
+    const currentDay = today.getDate();
+
+    // Si el día actual es mayor al día de pago, está vencido
+    if (currentDay > alumno.dia_pago) {
+      return "vencido"; // Ya pasó su fecha de pago
+    }
+    return "proximo"; // Aún no llega su fecha de pago
+  };
 
   // -- DATA FETCHING --
   const fetchData = async () => {
@@ -120,6 +133,10 @@ export default function GestionPagosPage() {
     });
 
   const listaPendientes = alumnos.filter((a) => !pagadosIds.has(a.id));
+
+  // Separar pendientes en vencidos y próximos
+  const vencidos = listaPendientes.filter((a) => getPaymentStatus(a) === "vencido");
+  const proximos = listaPendientes.filter((a) => getPaymentStatus(a) === "proximo");
 
   const stats: Stats = {
     totalActivos: alumnos.length,
@@ -189,7 +206,6 @@ export default function GestionPagosPage() {
     }
   };
 
-
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("es-MX", {
       style: "currency",
@@ -218,9 +234,7 @@ export default function GestionPagosPage() {
       {/* HEADER */}
       <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-white">
-            Gestión de Pagos
-          </h1>
+          <h1 className="text-3xl font-bold text-white">Gestión de Pagos</h1>
           <p className="text-gray-400">
             Administra los cobros mensuales de tus alumnos
           </p>
@@ -275,9 +289,7 @@ export default function GestionPagosPage() {
       </div>
 
       {loading ? (
-        <div className="text-center py-20 text-gray-400">
-          Cargando datos...
-        </div>
+        <div className="text-center py-20 text-gray-400">Cargando datos...</div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* COLUMNA PENDIENTES */}
@@ -294,27 +306,102 @@ export default function GestionPagosPage() {
                   ¡Todos han pagado! 🎉
                 </div>
               ) : (
-                listaPendientes.map((alumno) => (
-                  <div
-                    key={alumno.id}
-                    className="flex justify-between items-center p-3 bg-gray-700 rounded-xl hover:bg-gray-600 transition-colors border border-gray-600"
-                  >
-                    <div>
-                      <Link href={`/profesores/home/alumnos/${alumno.id}`} className="font-semibold text-white hover:text-purple-400 hover:underline">
-                        {alumno.nombre_completo}
-                      </Link>
-                      <p className="text-sm text-gray-300">
-                        Debe: {formatCurrency(alumno.mensualidad)}
-                      </p>
-                    </div>
-                    <button
-                      onClick={() => handleOpenModal(alumno)}
-                      className="px-3 py-1.5 bg-emerald-500 text-white text-sm rounded-lg hover:bg-emerald-600 transition-shadow shadow-sm font-medium"
-                    >
-                      Registrar
-                    </button>
-                  </div>
-                ))
+                <>
+                  {/* Primero mostrar los vencidos */}
+                  {vencidos.map((alumno) => {
+                    const status = getPaymentStatus(alumno);
+                    const isVencido = status === "vencido";
+
+                    return (
+                      <div
+                        key={alumno.id}
+                        className={`flex justify-between items-center p-3 rounded-xl hover:bg-gray-600 transition-colors border ${
+                          isVencido
+                            ? "bg-red-900/20 border-red-600/50"
+                            : "bg-gray-700 border-gray-600"
+                        }`}
+                      >
+                        <div>
+                          <Link
+                            href={`/profesores/home/alumnos/${alumno.id}`}
+                            className="font-semibold text-white hover:text-purple-400 hover:underline"
+                          >
+                            {alumno.nombre_completo}
+                          </Link>
+                          <p className="text-sm text-gray-300">
+                            {isVencido ? (
+                              <>
+                                <span className="text-red-400 font-semibold">Debe:</span> {formatCurrency(alumno.mensualidad)}
+                                <span className="text-red-300 text-xs ml-1">(Vencido desde el día {alumno.dia_pago})</span>
+                              </>
+                            ) : (
+                              <>
+                                <span className="text-blue-400 font-semibold">Puede pagar:</span> {formatCurrency(alumno.mensualidad)}
+                                <span className="text-gray-400 text-xs ml-1">(Paga el día {alumno.dia_pago})</span>
+                              </>
+                            )}
+                          </p>
+                        </div>
+                        <button
+                          onClick={() => handleOpenModal(alumno)}
+                          className="px-3 py-1.5 bg-emerald-500 text-white text-sm rounded-lg hover:bg-emerald-600 transition-shadow shadow-sm font-medium"
+                        >
+                          Registrar
+                        </button>
+                      </div>
+                    );
+                  })}
+
+                  {/* Separador si hay ambos tipos */}
+                  {vencidos.length > 0 && proximos.length > 0 && (
+                    <div className="border-t border-gray-600 my-2"></div>
+                  )}
+
+                  {/* Luego mostrar los que pueden pagar anticipadamente */}
+                  {proximos.map((alumno) => {
+                    const status = getPaymentStatus(alumno);
+                    const isVencido = status === "vencido";
+
+                    return (
+                      <div
+                        key={alumno.id}
+                        className={`flex justify-between items-center p-3 rounded-xl hover:bg-gray-600 transition-colors border ${
+                          isVencido
+                            ? "bg-red-900/20 border-red-600/50"
+                            : "bg-gray-700 border-gray-600"
+                        }`}
+                      >
+                        <div>
+                          <Link
+                            href={`/profesores/home/alumnos/${alumno.id}`}
+                            className="font-semibold text-white hover:text-purple-400 hover:underline"
+                          >
+                            {alumno.nombre_completo}
+                          </Link>
+                          <p className="text-sm text-gray-300">
+                            {isVencido ? (
+                              <>
+                                <span className="text-red-400 font-semibold">Debe:</span> {formatCurrency(alumno.mensualidad)}
+                                <span className="text-red-300 text-xs ml-1">(Vencido desde el día {alumno.dia_pago})</span>
+                              </>
+                            ) : (
+                              <>
+                                <span className="text-blue-400 font-semibold">Puede pagar:</span> {formatCurrency(alumno.mensualidad)}
+                                <span className="text-gray-400 text-xs ml-1">(Paga el día {alumno.dia_pago})</span>
+                              </>
+                            )}
+                          </p>
+                        </div>
+                        <button
+                          onClick={() => handleOpenModal(alumno)}
+                          className="px-3 py-1.5 bg-emerald-500 text-white text-sm rounded-lg hover:bg-emerald-600 transition-shadow shadow-sm font-medium"
+                        >
+                          Registrar
+                        </button>
+                      </div>
+                    );
+                  })}
+                </>
               )}
             </div>
           </div>
@@ -340,7 +427,10 @@ export default function GestionPagosPage() {
                   >
                     <div>
                       <h3 className="font-semibold text-white">
-                        <Link href={`/profesores/home/alumnos/${item.id}`} className="hover:text-purple-400 hover:underline">
+                        <Link
+                          href={`/profesores/home/alumnos/${item.id}`}
+                          className="hover:text-purple-400 hover:underline"
+                        >
                           {item.nombre_completo}
                         </Link>
                       </h3>
@@ -479,7 +569,6 @@ export default function GestionPagosPage() {
                   <option value="efectivo">Efectivo</option>
                   <option value="transferencia">Transferencia</option>
                   <option value="tarjeta">Tarjeta</option>
-                  <option value="stripe">Stripe</option>
                   <option value="otro">Otro</option>
                 </select>
               </div>

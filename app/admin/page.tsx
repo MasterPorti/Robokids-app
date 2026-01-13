@@ -19,11 +19,31 @@ interface Profesor {
   totalMensualidad: number;
 }
 
+interface AlumnoPendiente {
+  id: string;
+  nombre: string;
+  mensualidad: number;
+  dia_pago: number;
+  profesor: string;
+  profesor_id: string;
+}
+
+interface DetallePendientes {
+  totalPendiente: number;
+  cantidadAlumnos: number;
+  alumnos: AlumnoPendiente[];
+  mesActual: number;
+  anioActual: number;
+}
+
 export default function AdminDashboard() {
   const [metricas, setMetricas] = useState<Metricas | null>(null);
   const [profesores, setProfesores] = useState<Profesor[]>([]);
   const [loading, setLoading] = useState(true);
   const [mostrarMontos, setMostrarMontos] = useState(false);
+  const [modalPendientes, setModalPendientes] = useState(false);
+  const [detallePendientes, setDetallePendientes] = useState<DetallePendientes | null>(null);
+  const [loadingDetalle, setLoadingDetalle] = useState(false);
 
   useEffect(() => {
     cargarDatos();
@@ -49,6 +69,23 @@ export default function AdminDashboard() {
       console.error("Error cargando datos:", error);
     }
     setLoading(false);
+  }
+
+  async function cargarDetallePendientes() {
+    setLoadingDetalle(true);
+    try {
+      const res = await fetch("/api/admin/alumnos/pendientes");
+      const data = await res.json();
+      if (data.success) {
+        setDetallePendientes(data.data);
+        setModalPendientes(true);
+      }
+    } catch (error) {
+      console.error("Error cargando detalle de pendientes:", error);
+      alert("Error cargando el detalle");
+    } finally {
+      setLoadingDetalle(false);
+    }
   }
 
   if (loading) {
@@ -128,6 +165,19 @@ export default function AdminDashboard() {
               {mostrarMontos ? "👁️" : "👁️‍🗨️"}{" "}
               {mostrarMontos ? "Ocultar" : "Mostrar"} Montos
             </button>
+            <Link
+              href="/admin/alumnos"
+              style={{
+                padding: "12px 24px",
+                background: "#10b981",
+                color: "white",
+                textDecoration: "none",
+                borderRadius: "8px",
+                fontWeight: "600",
+              }}
+            >
+              📊 Alumnos
+            </Link>
             <Link
               href="/admin/stripe"
               style={{
@@ -312,6 +362,24 @@ export default function AdminDashboard() {
                 ? `$${metricas?.pendientePorCobrar?.toLocaleString() || 0}`
                 : "$****"}
             </p>
+            <button
+              onClick={cargarDetallePendientes}
+              disabled={loadingDetalle}
+              style={{
+                marginTop: "12px",
+                padding: "8px 16px",
+                background: "#ef4444",
+                color: "white",
+                border: "none",
+                borderRadius: "6px",
+                cursor: "pointer",
+                fontSize: "13px",
+                fontWeight: "600",
+                width: "100%",
+              }}
+            >
+              {loadingDetalle ? "Cargando..." : "📋 Ver Detalle"}
+            </button>
           </div>
         </div>
 
@@ -418,6 +486,153 @@ export default function AdminDashboard() {
           )}
         </div>
       </div>
+
+      {/* MODAL DE DETALLE DE PENDIENTES */}
+      {modalPendientes && detallePendientes && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: "rgba(0,0,0,0.8)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 1000,
+            padding: "20px",
+          }}
+          onClick={() => setModalPendientes(false)}
+        >
+          <div
+            style={{
+              background: "#1a1a1a",
+              borderRadius: "12px",
+              maxWidth: "900px",
+              width: "100%",
+              maxHeight: "80vh",
+              overflow: "auto",
+              border: "1px solid #333",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header del Modal */}
+            <div
+              style={{
+                padding: "24px",
+                borderBottom: "1px solid #333",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              <div>
+                <h2 style={{ margin: "0", fontSize: "24px", fontWeight: "bold" }}>
+                  📋 Detalle de Pagos Pendientes
+                </h2>
+                <p style={{ margin: "5px 0 0 0", color: "#999", fontSize: "14px" }}>
+                  {detallePendientes.cantidadAlumnos} alumnos sin pagar -{" "}
+                  {["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"][detallePendientes.mesActual - 1]}{" "}
+                  {detallePendientes.anioActual}
+                </p>
+              </div>
+              <button
+                onClick={() => setModalPendientes(false)}
+                style={{
+                  background: "#333",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "6px",
+                  padding: "8px 16px",
+                  cursor: "pointer",
+                  fontSize: "14px",
+                  fontWeight: "600",
+                }}
+              >
+                ✕ Cerrar
+              </button>
+            </div>
+
+            {/* Resumen */}
+            <div
+              style={{
+                padding: "20px 24px",
+                background: "#0a0a0a",
+                borderBottom: "1px solid #333",
+              }}
+            >
+              <p style={{ margin: "0", color: "#999", fontSize: "14px" }}>
+                Total Pendiente
+              </p>
+              <p
+                style={{
+                  margin: "5px 0 0 0",
+                  fontSize: "32px",
+                  fontWeight: "bold",
+                  color: "#ef4444",
+                }}
+              >
+                ${detallePendientes.totalPendiente.toLocaleString()}
+              </p>
+            </div>
+
+            {/* Lista de Alumnos */}
+            <div style={{ padding: "24px" }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+                {detallePendientes.alumnos.map((alumno) => (
+                  <div
+                    key={alumno.id}
+                    style={{
+                      background: "#0a0a0a",
+                      padding: "16px",
+                      borderRadius: "8px",
+                      border: "1px solid #333",
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                    }}
+                  >
+                    <div>
+                      <p
+                        style={{
+                          margin: "0",
+                          fontWeight: "600",
+                          fontSize: "16px",
+                          color: "#fff",
+                        }}
+                      >
+                        {alumno.nombre}
+                      </p>
+                      <p
+                        style={{
+                          margin: "5px 0 0 0",
+                          fontSize: "14px",
+                          color: "#999",
+                        }}
+                      >
+                        Profesor: {alumno.profesor} • Día de pago: {alumno.dia_pago}
+                      </p>
+                    </div>
+                    <div style={{ textAlign: "right" }}>
+                      <p
+                        style={{
+                          margin: "0",
+                          fontWeight: "600",
+                          fontSize: "18px",
+                          color: "#ef4444",
+                        }}
+                      >
+                        ${alumno.mensualidad.toLocaleString()}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

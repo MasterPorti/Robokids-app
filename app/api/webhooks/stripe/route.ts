@@ -105,17 +105,29 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
     return;
   }
 
-  // Actualizar stripe_customer_id si no está guardado
+  // Actualizar stripe_customer_id y mensualidad según el plan
   const customerId = typeof session.customer === "string"
     ? session.customer
     : session.customer?.id;
 
+  const updateData: any = {};
+
   if (customerId && !alumno.stripe_customer_id) {
+    updateData.stripe_customer_id = customerId;
+  }
+
+  // Actualizar mensualidad según el tipo de plan
+  if (tipoPlan === "plan_6_meses") {
+    updateData.mensualidad = 1500;
+    console.log(`Actualizando mensualidad a $1500 (plan de 6 meses)`);
+  }
+
+  if (Object.keys(updateData).length > 0) {
     await supabaseAdmin
       .from("alumnos")
-      .update({ stripe_customer_id: customerId })
+      .update(updateData)
       .eq("id", userId);
-    console.log(`Customer ID ${customerId} asociado al alumno ${userId}`);
+    console.log(`Alumno ${userId} actualizado:`, updateData);
   }
 
   // Obtener fecha y período del pago
@@ -174,16 +186,19 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
     return;
   }
 
-  // Actualizar o crear el registro del alumno con el customer_id de Stripe
+  // Actualizar stripe_customer_id y mensualidad a $1600 (suscripción mensual)
   const { error } = await supabaseAdmin
     .from("alumnos")
-    .update({ stripe_customer_id: customerId })
+    .update({
+      stripe_customer_id: customerId,
+      mensualidad: 1600
+    })
     .eq("id", userId);
 
   if (error) {
-    console.error("Error actualizando stripe_customer_id:", error);
+    console.error("Error actualizando alumno:", error);
   } else {
-    console.log(`Alumno ${userId} asociado con customer ${customerId}`);
+    console.log(`Alumno ${userId} asociado con customer ${customerId} - Mensualidad actualizada a $1600`);
   }
 }
 
@@ -229,6 +244,15 @@ async function handlePaymentSucceeded(invoice: Stripe.Invoice) {
     return;
   }
 
+  // Asegurarse de que la mensualidad esté actualizada a $1600 (suscripción mensual)
+  if (alumno.mensualidad !== 1600) {
+    await supabaseAdmin
+      .from("alumnos")
+      .update({ mensualidad: 1600 })
+      .eq("id", alumno.id);
+    console.log(`Mensualidad del alumno ${alumno.id} actualizada a $1600`);
+  }
+
   // Registrar el pago en la base de datos
   const { error: pagoError } = await supabaseAdmin
     .from("pagos")
@@ -240,9 +264,8 @@ async function handlePaymentSucceeded(invoice: Stripe.Invoice) {
       fecha_pago: fechaPago.toISOString().split("T")[0],
       monto: invoice.amount_paid / 100, // Convertir de centavos a unidad
       metodo_pago: "stripe",
-      stripe_payment_id: invoice.payment_intent as string,
       stripe_invoice_id: invoice.id,
-      notas: `Pago automático vía Stripe - Invoice: ${invoice.number}`,
+      notas: `Pago automático vía Stripe - Invoice: ${invoice.number || "N/A"}`,
     });
 
   if (pagoError) {

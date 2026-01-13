@@ -4,6 +4,7 @@ import { useState, useEffect, FormEvent } from "react";
 import { supabase } from "@/lib/supabase"; // Tu cliente principal (con sesión del profesor)
 import { useRouter } from "next/navigation";
 import { Horario, SUCURSALES, Sucursal } from "@/lib/types";
+import Link from "next/link";
 
 // 1. Definimos la forma de nuestros datos (Interfaces)
 interface FormData {
@@ -108,7 +109,8 @@ export default function CrearAlumno() {
       // Guardar las credenciales para mostrarlas
       setCredenciales(result.credenciales);
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Error desconocido";
+      const errorMessage =
+        error instanceof Error ? error.message : "Error desconocido";
       alert("Error: " + errorMessage);
     }
 
@@ -160,10 +162,14 @@ export default function CrearAlumno() {
 
   return (
     <div className="p-10 max-w-lg mx-auto font-sans bg-black min-h-screen">
-      <h1 className="text-2xl font-bold mb-6 text-white">Inscribir Nuevo Alumno</h1>
+      <h1 className="text-2xl font-bold mb-6 text-white">
+        Inscribir Nuevo Alumno
+      </h1>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <label className="flex flex-col">
-          <span className="font-semibold text-zinc-300">Nombre del Alumno:</span>
+          <span className="font-semibold text-zinc-300">
+            Nombre del Alumno:
+          </span>
           <input
             type="text"
             required
@@ -189,7 +195,9 @@ export default function CrearAlumno() {
         </label>
 
         <label className="flex flex-col">
-          <span className="font-semibold text-zinc-300">Teléfono / WhatsApp:</span>
+          <span className="font-semibold text-zinc-300">
+            Teléfono / WhatsApp:
+          </span>
           <input
             type="tel"
             required
@@ -234,7 +242,9 @@ export default function CrearAlumno() {
         </div>
 
         <label className="flex flex-col">
-          <span className="font-semibold text-zinc-300">Mensualidad (Pago mensual):</span>
+          <span className="font-semibold text-zinc-300">
+            Mensualidad (Pago mensual):
+          </span>
           <input
             type="number"
             required
@@ -257,7 +267,11 @@ export default function CrearAlumno() {
             value={formData.sucursal}
             onChange={(e) => {
               const nuevaSucursal = e.target.value as Sucursal;
-              setFormData({ ...formData, sucursal: nuevaSucursal, horario_id: "" });
+              setFormData({
+                ...formData,
+                sucursal: nuevaSucursal,
+                horario_id: "",
+              });
             }}
           >
             {SUCURSALES.map((s) => (
@@ -269,7 +283,9 @@ export default function CrearAlumno() {
         </label>
 
         <label className="flex flex-col">
-          <span className="font-semibold text-zinc-300">Horario (opcional):</span>
+          <span className="font-semibold text-zinc-300">
+            Horario (opcional):
+          </span>
           <select
             className="p-2 border border-zinc-700 rounded mt-1 bg-zinc-900 text-white focus:border-blue-500 focus:outline-none"
             value={formData.horario_id}
@@ -282,18 +298,17 @@ export default function CrearAlumno() {
               .filter((h) => h.sucursal === formData.sucursal)
               .map((h) => (
                 <option key={h.id} value={h.id}>
-                  {h.dia_semana} {h.hora_inicio.substring(0, 5)} - {h.hora_fin.substring(0, 5)}
+                  {h.dia_semana} {h.hora_inicio.substring(0, 5)} -{" "}
+                  {h.hora_fin.substring(0, 5)}
                 </option>
               ))}
           </select>
-          {horarios.filter((h) => h.sucursal === formData.sucursal).length === 0 && (
-            <p className="text-sm text-zinc-500 mt-1">
-              No hay horarios disponibles para esta sucursal.{" "}
-              <a href="/profesores/horarios" className="text-blue-500 hover:underline">
-                Crear horario
-              </a>
-            </p>
-          )}
+          <Link
+            href="/profesores/horarios"
+            className="text-blue-500 hover:underline"
+          >
+            Crear horario
+          </Link>
         </label>
 
         <button

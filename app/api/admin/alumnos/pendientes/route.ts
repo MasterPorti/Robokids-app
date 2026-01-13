@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
     // 1. Obtener todos los alumnos activos
     const { data: alumnos, error: alumnosError } = await supabaseAdmin
       .from("alumnos")
-      .select("*")
+      .select("id, nombre_completo, mensualidad, profesor_id, dia_pago")
       .eq("activo", true);
 
     if (alumnosError) throw alumnosError;
@@ -29,64 +29,54 @@ export async function GET(request: NextRequest) {
 
     const { data: pagosDelMes, error: pagosError } = await supabaseAdmin
       .from("pagos")
-      .select("alumno_id, monto")
+      .select("alumno_id")
       .eq("periodo_mes", mesActual)
       .eq("periodo_anio", anioActual);
 
     if (pagosError) throw pagosError;
 
-    // 3. Calcular métricas correctamente
-    const totalAlumnos = alumnos?.length || 0;
-
-    // IDs de alumnos que ya pagaron
+    // 3. Filtrar alumnos que NO han pagado
     const alumnosPagadosIds = new Set(pagosDelMes?.map(p => p.alumno_id) || []);
-
-    // Alumnos que NO han pagado
     const alumnosPendientes = alumnos?.filter(a => !alumnosPagadosIds.has(a.id)) || [];
 
-    // Total esperado: suma de mensualidades de TODOS los alumnos activos
-    const totalMensualidadEsperada = alumnos?.reduce(
-      (sum, alumno) => sum + (alumno.mensualidad || 0),
-      0
-    ) || 0;
+    // 4. Obtener información de los profesores desde auth.users
+    const profesoresIds = [...new Set(alumnosPendientes.map(a => a.profesor_id))];
+    const profesoresMap = new Map();
 
-    // Total cobrado: suma de montos de pagos
-    const totalCobradoMes = pagosDelMes?.reduce(
-      (sum, pago) => sum + (pago.monto || 0),
-      0
-    ) || 0;
+    for (const profesorId of profesoresIds) {
+      const { data: userData, error: userError } = await supabaseAdmin.auth.admin.getUserById(profesorId);
 
-    // Pendiente por cobrar: solo la suma de mensualidades de alumnos que NO han pagado
-    const pendientePorCobrar = alumnosPendientes.reduce(
+      if (!userError && userData.user) {
+        profesoresMap.set(profesorId, userData.user.user_metadata?.nombre_completo || "Sin nombre");
+      } else {
+        profesoresMap.set(profesorId, "Desconocido");
+      }
+    }
+
+    // 5. Agrupar alumnos pendientes por profesor
+    const alumnosPorProfesor = alumnosPendientes.map(alumno => ({
+      id: alumno.id,
+      nombre: alumno.nombre_completo,
+      mensualidad: alumno.mensualidad,
+      dia_pago: alumno.dia_pago,
+      profesor: profesoresMap.get(alumno.profesor_id) || "Desconocido",
+      profesor_id: alumno.profesor_id,
+    }));
+
+    // 6. Calcular total pendiente
+    const totalPendiente = alumnosPendientes.reduce(
       (sum, alumno) => sum + (alumno.mensualidad || 0),
       0
     );
 
-    // 4. Contar profesores
-    const { count: totalProfesores, error: profesoresError } = await supabaseAdmin
-      .from("alumnos")
-      .select("profesor_id", { count: "exact", head: false })
-      .eq("activo", true);
-
-    // Obtener profesores únicos
-    const { data: profesoresData } = await supabaseAdmin
-      .from("alumnos")
-      .select("profesor_id")
-      .eq("activo", true);
-
-    const profesoresUnicos = new Set(profesoresData?.map(a => a.profesor_id)).size;
-
     return NextResponse.json({
       success: true,
-      metricas: {
-        totalAlumnos,
-        totalProfesores: profesoresUnicos,
-        totalMensualidadEsperada,
-        totalCobradoMes,
-        pendientePorCobrar,
-        porcentajeCobrado: totalMensualidadEsperada > 0
-          ? (totalCobradoMes / totalMensualidadEsperada) * 100
-          : 0,
+      data: {
+        totalPendiente,
+        cantidadAlumnos: alumnosPendientes.length,
+        alumnos: alumnosPorProfesor,
+        mesActual,
+        anioActual,
       },
     });
   } catch (error) {
