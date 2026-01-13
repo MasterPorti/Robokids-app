@@ -24,6 +24,7 @@ interface EstadoPago {
   name: string;
   value: number;
   fill: string;
+  [key: string]: string | number;
 }
 
 interface AlumnoSinPagar {
