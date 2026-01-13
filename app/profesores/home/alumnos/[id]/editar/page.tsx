@@ -141,7 +141,7 @@ export default function EditarAlumno() {
   if (loading) {
     return (
       <div className="p-10 text-center">
-        <p className="text-lg">Cargando datos del alumno...</p>
+        <p className="text-lg dark:text-gray-200">Cargando datos del alumno...</p>
       </div>
     );
   }
@@ -149,16 +149,16 @@ export default function EditarAlumno() {
   return (
     <div className="p-10 max-w-2xl mx-auto">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold mb-2">Editar Alumno</h1>
-        <p className="text-gray-600">
-          Usuario: <code className="bg-gray-100 px-2 py-1 rounded">{username}</code>
+        <h1 className="text-3xl font-bold mb-2 dark:text-white">Editar Alumno</h1>
+        <p className="text-gray-600 dark:text-gray-300">
+          Usuario: <code className="bg-gray-100 dark:bg-gray-700 dark:text-gray-200 px-2 py-1 rounded">{username}</code>
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow">
+      <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
         <div className="space-y-4">
           <div>
-            <label className="block font-semibold mb-2">
+            <label className="block font-semibold mb-2 dark:text-gray-200">
               Nombre Completo del Alumno:
             </label>
             <input
@@ -168,12 +168,12 @@ export default function EditarAlumno() {
               onChange={(e: ChangeEvent<HTMLInputElement>) =>
                 setFormData({ ...formData, nombre_completo: e.target.value })
               }
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full p-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
           <div>
-            <label className="block font-semibold mb-2">
+            <label className="block font-semibold mb-2 dark:text-gray-200">
               Nombre del Tutor:
             </label>
             <input
@@ -183,12 +183,12 @@ export default function EditarAlumno() {
               onChange={(e: ChangeEvent<HTMLInputElement>) =>
                 setFormData({ ...formData, nombre_tutor: e.target.value })
               }
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full p-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
           <div>
-            <label className="block font-semibold mb-2">
+            <label className="block font-semibold mb-2 dark:text-gray-200">
               Teléfono / WhatsApp:
             </label>
             <input
@@ -198,13 +198,13 @@ export default function EditarAlumno() {
               onChange={(e: ChangeEvent<HTMLInputElement>) =>
                 setFormData({ ...formData, telefono_tutor: e.target.value })
               }
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full p-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block font-semibold mb-2">
+              <label className="block font-semibold mb-2 dark:text-gray-200">
                 Fecha de Inscripción:
               </label>
               <input
@@ -217,18 +217,18 @@ export default function EditarAlumno() {
                     fecha_inscripcion: e.target.value,
                   })
                 }
-                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full p-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
 
             <div>
-              <label className="block font-semibold mb-2">Día de Pago:</label>
+              <label className="block font-semibold mb-2 dark:text-gray-200">Día de Pago:</label>
               <select
                 value={formData.dia_pago}
                 onChange={(e: ChangeEvent<HTMLSelectElement>) =>
                   setFormData({ ...formData, dia_pago: e.target.value })
                 }
-                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                className="w-full p-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 {[1, 5, 10, 15, 20, 25, 30].map((d) => (
                   <option key={d} value={d}>
@@ -240,7 +240,7 @@ export default function EditarAlumno() {
           </div>
 
           <div>
-            <label className="block font-semibold mb-2">
+            <label className="block font-semibold mb-2 dark:text-gray-200">
               Mensualidad (Pago mensual):
             </label>
             <input
@@ -252,19 +252,19 @@ export default function EditarAlumno() {
               onChange={(e: ChangeEvent<HTMLInputElement>) =>
                 setFormData({ ...formData, mensualidad: e.target.value })
               }
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full p-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
           <div>
-            <label className="block font-semibold mb-2">Sucursal:</label>
+            <label className="block font-semibold mb-2 dark:text-gray-200">Sucursal:</label>
             <select
               value={formData.sucursal}
               onChange={(e: ChangeEvent<HTMLSelectElement>) => {
                 const nuevaSucursal = e.target.value as Sucursal;
                 setFormData({ ...formData, sucursal: nuevaSucursal, horario_id: "" });
               }}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+              className="w-full p-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               {SUCURSALES.map((s) => (
                 <option key={s} value={s}>
@@ -275,13 +275,13 @@ export default function EditarAlumno() {
           </div>
 
           <div>
-            <label className="block font-semibold mb-2">Horario (opcional):</label>
+            <label className="block font-semibold mb-2 dark:text-gray-200">Horario (opcional):</label>
             <select
               value={formData.horario_id}
               onChange={(e: ChangeEvent<HTMLSelectElement>) =>
                 setFormData({ ...formData, horario_id: e.target.value })
               }
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+              className="w-full p-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">Sin horario asignado</option>
               {horarios
@@ -293,16 +293,16 @@ export default function EditarAlumno() {
                 ))}
             </select>
             {horarios.filter((h) => h.sucursal === formData.sucursal).length === 0 && (
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                 No hay horarios disponibles para esta sucursal.{" "}
-                <a href="/profesores/horarios" className="text-blue-600 hover:underline">
+                <a href="/profesores/horarios" className="text-blue-600 dark:text-blue-400 hover:underline">
                   Crear horario
                 </a>
               </p>
             )}
           </div>
 
-          <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
+          <div className="flex items-center gap-3 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
             <label className="flex items-center cursor-pointer">
               <input
                 type="checkbox"
@@ -310,13 +310,13 @@ export default function EditarAlumno() {
                 onChange={(e: ChangeEvent<HTMLInputElement>) =>
                   setFormData({ ...formData, activo: e.target.checked })
                 }
-                className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                className="w-5 h-5 text-blue-600 border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500"
               />
-              <span className="ml-2 font-semibold">
+              <span className="ml-2 font-semibold dark:text-gray-200">
                 Alumno Activo
               </span>
             </label>
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-gray-600 dark:text-gray-300">
               (Los alumnos inactivos no aparecen en el registro de pagos)
             </p>
           </div>
@@ -333,15 +333,15 @@ export default function EditarAlumno() {
           <button
             type="button"
             onClick={() => router.push("/profesores/home/alumnos")}
-            className="px-6 py-3 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300"
+            className="px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 font-semibold rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600"
           >
             Cancelar
           </button>
         </div>
       </form>
 
-      <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-        <p className="text-sm text-yellow-800">
+      <div className="mt-6 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+        <p className="text-sm text-yellow-800 dark:text-yellow-200">
           <strong>Nota:</strong> El nombre de usuario no se puede cambiar. Si
           necesitas generar una nueva contraseña, usa el botón "Cambiar
           Contraseña" en la lista de alumnos.

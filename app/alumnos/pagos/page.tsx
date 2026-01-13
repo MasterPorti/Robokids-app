@@ -22,6 +22,8 @@ interface EstadoPago {
   ya_pago: boolean;
   pago: any | null;
   suscripcion_stripe: Suscripcion | null;
+  es_pago_nivel: boolean;
+  siguiente_mes_pagado: boolean;
 }
 
 export default function PagosPage() {
@@ -33,15 +35,49 @@ export default function PagosPage() {
   const router = useRouter();
 
   useEffect(() => {
-    // Verificar si viene de un pago exitoso
-    const params = new URLSearchParams(window.location.search);
-    const payment = params.get("payment");
-    if (payment) {
-      setPaymentStatus(payment);
-      // Limpiar el parámetro de la URL sin recargar la página
-      window.history.replaceState({}, "", window.location.pathname);
+    async function inicializar() {
+      // Verificar si viene de un pago exitoso
+      const params = new URLSearchParams(window.location.search);
+      const payment = params.get("payment");
+      const sessionId = params.get("session_id");
+
+      if (payment) {
+        setPaymentStatus(payment);
+
+        // Si hay session_id, verificar el pago primero
+        if (payment === "success" && sessionId) {
+          console.log("Verificando pago con session_id:", sessionId);
+          try {
+            const response = await fetch("/api/verificar-pago", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ sessionId }),
+            });
+
+            const data = await response.json();
+            console.log("Resultado de verificación:", data);
+
+            if (data.success) {
+              console.log("✅ Pago verificado y registrado exitosamente");
+            } else {
+              console.error("Error al verificar pago:", data.error);
+            }
+          } catch (error) {
+            console.error("Error al verificar pago:", error);
+          }
+        }
+
+        // Limpiar los parámetros de la URL sin recargar la página
+        window.history.replaceState({}, "", window.location.pathname);
+      }
+
+      // Cargar el estado de pago
+      cargarEstadoPago();
     }
-    cargarEstadoPago();
+
+    inicializar();
   }, []);
 
   // Auto-refresh cuando payment=success y no se ha detectado la suscripción
@@ -280,10 +316,9 @@ export default function PagosPage() {
         {estadoPago.ya_pago ? (
           <EstadoPagado estadoPago={estadoPago} nombreMes={nombreMes} />
         ) : (
-          <BotonSuscripcion
+          <SeleccionDePlanes
             userId={estadoPago.alumno_id}
             userName={estadoPago.nombre_completo}
-            mensualidad={estadoPago.mensualidad}
             nombreMes={nombreMes}
           />
         )}
@@ -357,11 +392,17 @@ function EstadoPagado({
           color: "#10b981",
         }}
       >
-        {estadoPago.suscripcion_stripe ? "¡Suscripción Activa!" : "¡Pago Completado!"}
+        {estadoPago.suscripcion_stripe
+          ? "¡Suscripción Activa!"
+          : estadoPago.es_pago_nivel
+          ? "¡Plan por Nivel Activo!"
+          : "¡Pago Completado!"}
       </h2>
       <p style={{ margin: "0 0 24px 0", color: "#999", fontSize: "16px" }}>
         {estadoPago.suscripcion_stripe
           ? `Tu suscripción está activa y se renovará automáticamente.`
+          : estadoPago.es_pago_nivel
+          ? `Tienes pagados 6 meses completos del nivel. No necesitas realizar pagos mensuales.`
           : `Tu pago del mes de ${nombreMes} ${estadoPago.anio_actual} ha sido registrado correctamente.`}
       </p>
       <div
@@ -375,7 +416,11 @@ function EstadoPagado({
       >
         <div style={{ marginBottom: "16px" }}>
           <p style={{ margin: "0", fontSize: "14px", color: "#999" }}>
-            {estadoPago.suscripcion_stripe ? "Monto Mensual" : "Monto Pagado"}
+            {estadoPago.suscripcion_stripe
+              ? "Monto Mensual"
+              : estadoPago.es_pago_nivel
+              ? "Monto Total del Nivel (6 meses)"
+              : "Monto Pagado"}
           </p>
           <p
             style={{
@@ -387,10 +432,19 @@ function EstadoPagado({
           >
             ${montoMostrar.toLocaleString()} MXN
           </p>
+          {estadoPago.es_pago_nivel && (
+            <p style={{ margin: "4px 0 0 0", fontSize: "12px", color: "#666" }}>
+              ($1,500 MXN por mes)
+            </p>
+          )}
         </div>
         <div>
           <p style={{ margin: "0", fontSize: "14px", color: "#999" }}>
-            {estadoPago.suscripcion_stripe ? "Inicio del Período" : "Fecha de Pago"}
+            {estadoPago.suscripcion_stripe
+              ? "Inicio del Período"
+              : estadoPago.es_pago_nivel
+              ? "Fecha de Pago del Nivel"
+              : "Fecha de Pago"}
           </p>
           <p style={{ margin: "8px 0 0 0", fontSize: "16px", fontWeight: "500" }}>
             {fechaPago}
@@ -448,27 +502,27 @@ function EstadoPagado({
       >
         {estadoPago.suscripcion_stripe
           ? "Tu suscripción se renovará automáticamente cada mes. Si tienes alguna duda, contacta a tu profesor."
+          : estadoPago.es_pago_nivel
+          ? "Has pagado por adelantado el nivel completo (6 meses). No necesitas realizar más pagos hasta completar este período. Si tienes alguna duda, contacta a tu profesor."
           : "Gracias por tu pago puntual. Si tienes alguna duda, contacta a tu profesor."}
       </p>
     </div>
   );
 }
 
-function BotonSuscripcion({
+function SeleccionDePlanes({
   userId,
   userName,
-  mensualidad,
   nombreMes,
 }: {
   userId: string;
   userName: string;
-  mensualidad: number;
   nombreMes: string;
 }) {
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState<string | null>(null);
 
-  const handleSubscribe = async () => {
-    setLoading(true);
+  const handleCheckout = async (tipoPlan: "mensual_unico" | "suscripcion_mensual" | "nivel_completo") => {
+    setLoading(tipoPlan);
     try {
       const response = await fetch("/api/checkout", {
         method: "POST",
@@ -478,130 +532,210 @@ function BotonSuscripcion({
         body: JSON.stringify({
           userId: userId,
           userName: userName,
+          tipoPlan: tipoPlan,
         }),
       });
 
       const data = await response.json();
 
       if (data.url) {
-        // Redirigir al usuario a la pasarela de pago de Stripe
         window.location.href = data.url;
       } else {
         console.error("No se recibió URL de Stripe");
         alert("Error al crear la sesión de pago");
+        setLoading(null);
       }
     } catch (error) {
       console.error("Error al procesar pago:", error);
       alert("Error al procesar el pago. Por favor, intenta de nuevo.");
-    } finally {
-      setLoading(false);
+      setLoading(null);
     }
   };
 
   return (
+    <div>
+      <h2
+        style={{
+          margin: "0 0 24px 0",
+          fontSize: "28px",
+          fontWeight: "bold",
+          textAlign: "center",
+        }}
+      >
+        Elige el plan que mejor se adapte a ti
+      </h2>
+      <p style={{ margin: "0 0 40px 0", color: "#999", textAlign: "center" }}>
+        Todos los planes incluyen acceso a materiales exclusivos y soporte personalizado.
+      </p>
+
+      <div
+        style={{
+          display: "flex",
+          gap: "24px",
+          flexWrap: "wrap",
+          justifyContent: "center",
+        }}
+      >
+        {/* Plan 1: Suscripción Mensual Recurrente */}
+        <TarjetaPlan
+          titulo="Pago Recurrente Automático"
+          precio="$1600 MXN/MES"
+          items={[
+            "Cargo automático, sin preocuparte por fechas",
+            "Garantiza continuidad en clases",
+            "Cancela cuando tú quieras",
+            "Menos trámites, más aprendizaje",
+          ]}
+          color="#ffc862"
+          textoBoton="Suscribirme"
+          loading={loading === "suscripcion_mensual"}
+          onClick={() => handleCheckout("suscripcion_mensual")}
+          destacado
+        />
+
+        {/* Plan 2: Plan Completo por Niveles */}
+        <TarjetaPlan
+          titulo="Plan Completo por Niveles"
+          precio="$1500 MXN/MES (6 meses)"
+          items={[
+            "Cobro único de $9000 MXN por 6 meses",
+            "Precio congelado durante todo el programa",
+            "Sin aumentos ni cargos futuros",
+            "Cancela cuando tú quieras",
+            "La opción más económica a largo plazo",
+          ]}
+          color="#a5bbd1"
+          textoBoton="Nivel completo"
+          loading={loading === "nivel_completo"}
+          onClick={() => handleCheckout("nivel_completo")}
+        />
+      </div>
+    </div>
+  );
+}
+
+function TarjetaPlan({
+  titulo,
+  precio,
+  items,
+  color,
+  textoBoton,
+  loading,
+  onClick,
+  destacado = false,
+}: {
+  titulo: string;
+  precio: string;
+  items: string[];
+  color: string;
+  textoBoton: string;
+  loading: boolean;
+  onClick: () => void;
+  destacado?: boolean;
+}) {
+  return (
     <div
       style={{
-        background: "#1a1a1a",
-        padding: "40px",
+        width: "320px",
+        background: destacado ? "#1f1f1f" : "#1a1a1a",
+        padding: "32px 24px",
         borderRadius: "16px",
-        boxShadow: "0 4px 20px rgba(255,255,255,0.1)",
+        border: destacado ? "2px solid " + color : "1px solid #333",
+        boxShadow: destacado ? "0 8px 24px rgba(255,200,98,0.2)" : "0 4px 12px rgba(0,0,0,0.3)",
+        position: "relative" as const,
+        transition: "transform 0.2s",
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.transform = "translateY(-4px)";
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.transform = "translateY(0)";
       }}
     >
-      <h2
+      {destacado && (
+        <div
+          style={{
+            position: "absolute",
+            top: "-12px",
+            left: "50%",
+            transform: "translateX(-50%)",
+            background: color,
+            color: "#000",
+            padding: "4px 16px",
+            borderRadius: "20px",
+            fontSize: "12px",
+            fontWeight: "bold",
+          }}
+        >
+          ⭐ MÁS POPULAR
+        </div>
+      )}
+
+      <h3
         style={{
           margin: "0 0 8px 0",
           fontSize: "24px",
           fontWeight: "bold",
+          color: color,
         }}
       >
-        Plan Mensual
-      </h2>
-      <p style={{ margin: "0 0 24px 0", color: "#999" }}>
-        Pago correspondiente a {nombreMes}
+        {titulo}
+      </h3>
+      <p style={{ margin: "0 0 16px 0", fontSize: "20px", fontWeight: "600" }}>
+        {precio}
       </p>
+
       <div
         style={{
-          background: "#0a0a0a",
-          padding: "24px",
-          borderRadius: "12px",
-          border: "1px solid #333",
-          marginBottom: "32px",
+          height: "2px",
+          background: color,
+          marginBottom: "20px",
+          opacity: 0.5,
         }}
-      >
-        <p style={{ margin: "0 0 8px 0", fontSize: "14px", color: "#999" }}>
-          Mensualidad
-        </p>
-        <p
-          style={{
-            margin: "0",
-            fontSize: "48px",
-            fontWeight: "bold",
-            color: "#fff",
-          }}
-        >
-          ${mensualidad.toLocaleString()}
-          <span style={{ fontSize: "24px", color: "#999", fontWeight: "normal" }}>
-            {" "}
-            MXN
-          </span>
-        </p>
-      </div>
-      <div
+      />
+
+      <ul
         style={{
-          background: "#0a0a0a",
-          padding: "16px",
-          borderRadius: "8px",
-          border: "1px solid #333",
-          marginBottom: "24px",
+          margin: "0 0 24px 0",
+          padding: "0 0 0 20px",
+          listStyle: "disc",
+          minHeight: "180px",
         }}
       >
-        <div style={{ marginBottom: "8px" }}>
-          <span style={{ fontSize: "14px", color: "#999" }}>Alumno: </span>
-          <span style={{ fontSize: "14px", fontWeight: "500" }}>{userName}</span>
-        </div>
-        <div>
-          <span style={{ fontSize: "14px", color: "#999" }}>ID: </span>
-          <span
+        {items.map((item, index) => (
+          <li
+            key={index}
             style={{
-              fontSize: "12px",
-              fontFamily: "monospace",
-              color: "#666",
+              marginBottom: "12px",
+              fontSize: "14px",
+              lineHeight: "1.5",
+              color: "#ccc",
             }}
           >
-            {userId.substring(0, 8)}...
-          </span>
-        </div>
-      </div>
+            {item}
+          </li>
+        ))}
+      </ul>
+
       <button
-        onClick={handleSubscribe}
+        onClick={onClick}
         disabled={loading}
         style={{
           width: "100%",
-          padding: "16px",
-          background: loading ? "#666" : "#635bff",
-          color: "white",
+          padding: "14px",
+          background: loading ? "#666" : color,
+          color: "#000",
           border: "none",
           borderRadius: "8px",
-          fontSize: "18px",
-          fontWeight: "600",
+          fontSize: "16px",
+          fontWeight: "700",
           cursor: loading ? "not-allowed" : "pointer",
           transition: "all 0.2s",
+          opacity: loading ? 0.6 : 1,
         }}
       >
-        {loading ? "Procesando..." : "Pagar con Stripe"}
+        {loading ? "Procesando..." : textoBoton}
       </button>
-      <p
-        style={{
-          margin: "16px 0 0 0",
-          fontSize: "12px",
-          color: "#666",
-          textAlign: "center",
-          lineHeight: "1.6",
-        }}
-      >
-        Al hacer clic en "Pagar con Stripe", serás redirigido a una página segura de
-        pago. Tu información está protegida y encriptada.
-      </p>
     </div>
   );
 }

@@ -8,6 +8,7 @@ interface UpdateAlumnoData {
   telefono_tutor?: string;
   dia_pago?: number;
   fecha_inscripcion?: string;
+  activo?: boolean;
 }
 
 // Helper para inicializar Supabase con Auth Header

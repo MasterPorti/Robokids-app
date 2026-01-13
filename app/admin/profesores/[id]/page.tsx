@@ -288,7 +288,7 @@ export default function ProfesorDetallePage() {
                 fontWeight: "bold",
               }}
             >
-              👨‍🏫 {profesor.nombre}
+              {profesor.nombre}
             </h1>
             <button
               onClick={() => setModalPassword(true)}
@@ -303,7 +303,7 @@ export default function ProfesorDetallePage() {
                 fontSize: "14px",
               }}
             >
-              🔑 Cambiar Contraseña
+              Cambiar Contraseña
             </button>
           </div>
 
@@ -316,7 +316,10 @@ export default function ProfesorDetallePage() {
             }}
           >
             <div>
-              <p style={{ margin: "0", fontSize: "12px" }} className="text-gray-400">
+              <p
+                style={{ margin: "0", fontSize: "12px" }}
+                className="text-gray-400"
+              >
                 Usuario
               </p>
               <p style={{ margin: "5px 0 0 0", fontWeight: "600" }}>
@@ -325,7 +328,10 @@ export default function ProfesorDetallePage() {
             </div>
             {profesor.email && (
               <div>
-                <p style={{ margin: "0", fontSize: "12px" }} className="text-gray-400">
+                <p
+                  style={{ margin: "0", fontSize: "12px" }}
+                  className="text-gray-400"
+                >
                   Email
                 </p>
                 <p style={{ margin: "5px 0 0 0", fontWeight: "600" }}>
@@ -335,7 +341,10 @@ export default function ProfesorDetallePage() {
             )}
             {profesor.telefono && (
               <div>
-                <p style={{ margin: "0", fontSize: "12px" }} className="text-gray-400">
+                <p
+                  style={{ margin: "0", fontSize: "12px" }}
+                  className="text-gray-400"
+                >
                   Teléfono
                 </p>
                 <p style={{ margin: "5px 0 0 0", fontWeight: "600" }}>
@@ -344,7 +353,10 @@ export default function ProfesorDetallePage() {
               </div>
             )}
             <div>
-              <p style={{ margin: "0", fontSize: "12px" }} className="text-gray-400">
+              <p
+                style={{ margin: "0", fontSize: "12px" }}
+                className="text-gray-400"
+              >
                 Total Alumnos
               </p>
               <p
@@ -358,8 +370,11 @@ export default function ProfesorDetallePage() {
               </p>
             </div>
             <div>
-              <p style={{ margin: "0", fontSize: "12px" }} className="text-gray-400">
-                Ingreso Mensual
+              <p
+                style={{ margin: "0", fontSize: "12px" }}
+                className="text-gray-400"
+              >
+                Ingreso Alumnos
               </p>
               <p
                 style={{
@@ -657,7 +672,9 @@ export default function ProfesorDetallePage() {
             </h2>
 
             <div style={{ marginBottom: "20px" }}>
-              <p className="text-gray-300" style={{ margin: "0 0 10px 0" }}>Alumno:</p>
+              <p className="text-gray-300" style={{ margin: "0 0 10px 0" }}>
+                Alumno:
+              </p>
               <p style={{ margin: "0", fontWeight: "600", fontSize: "18px" }}>
                 {modalPago.alumnoNombre}
               </p>
@@ -688,7 +705,9 @@ export default function ProfesorDetallePage() {
             </div>
 
             <div style={{ marginBottom: "20px" }}>
-              <p className="text-gray-300" style={{ margin: "0 0 10px 0" }}>Monto:</p>
+              <p className="text-gray-300" style={{ margin: "0 0 10px 0" }}>
+                Monto:
+              </p>
               <input
                 type="number"
                 value={modalPago.monto}
@@ -747,7 +766,10 @@ export default function ProfesorDetallePage() {
                 marginBottom: "20px",
               }}
             >
-              <p className="text-gray-300" style={{ margin: "0", fontSize: "14px" }}>
+              <p
+                className="text-gray-300"
+                style={{ margin: "0", fontSize: "14px" }}
+              >
                 Periodo:{" "}
                 {new Date().toLocaleString("es-ES", {
                   month: "long",
@@ -825,7 +847,9 @@ export default function ProfesorDetallePage() {
             </h2>
 
             <div style={{ marginBottom: "20px" }}>
-              <p className="text-gray-300" style={{ margin: "0 0 10px 0" }}>Profesor:</p>
+              <p className="text-gray-300" style={{ margin: "0 0 10px 0" }}>
+                Profesor:
+              </p>
               <p style={{ margin: "0", fontWeight: "600", fontSize: "18px" }}>
                 {profesor?.nombre}
               </p>

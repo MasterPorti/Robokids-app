@@ -1,6 +1,64 @@
 import { createClient } from "@supabase/supabase-js";
 import { NextRequest, NextResponse } from "next/server";
 
+interface ProfesorData {
+  usuario: string;
+  password: string;
+  nombreCompleto: string;
+  email?: string;
+  telefono: string;
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const datos: ProfesorData = await request.json();
+
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+    if (!supabaseUrl || !supabaseServiceKey) {
+      throw new Error("Missing Supabase environment variables");
+    }
+
+    const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
+      auth: { autoRefreshToken: false, persistSession: false },
+    });
+
+    // Email: usar el real si lo proporcionó, sino generar uno falso
+    const emailFinal = datos.email || `${datos.usuario}@sistema.local`;
+
+    // Crear el usuario en Auth usando el service role (sin confirmación de email)
+    const { data: userAuth, error: authError } =
+      await supabaseAdmin.auth.admin.createUser({
+        email: emailFinal,
+        password: datos.password,
+        email_confirm: true, // Auto-confirmar el email
+        user_metadata: {
+          username: datos.usuario,
+          nombre_completo: datos.nombreCompleto,
+          telefono: datos.telefono,
+          role: "profesor",
+        },
+      });
+
+    if (authError) throw authError;
+    if (!userAuth?.user) throw new Error("Failed to create user");
+
+    return NextResponse.json({
+      success: true,
+      profesor: {
+        id: userAuth.user.id,
+        username: datos.usuario,
+        nombreCompleto: datos.nombreCompleto,
+        email: emailFinal,
+      },
+    });
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    return NextResponse.json({ error: errorMessage }, { status: 400 });
+  }
+}
+
 export async function GET(request: NextRequest) {
   try {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;

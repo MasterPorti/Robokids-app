@@ -10,6 +10,7 @@ interface Alumno {
   id: string;
   nombre_completo: string;
   mensualidad: number;
+  stripe_customer_id?: string | null;
 }
 
 interface Pago {
@@ -361,7 +362,12 @@ export default function GestionPagosPage() {
                       <span className="px-2 py-1 bg-green-600 text-white text-xs rounded-md font-bold">
                         Pagado
                       </span>
-                      {item.pago && (
+                      {item.pago?.metodo_pago === "stripe" && (
+                        <span className="px-2 py-1 bg-purple-600/20 text-purple-400 text-xs rounded-md font-bold border border-purple-600/30">
+                          💳 Stripe
+                        </span>
+                      )}
+                      {item.pago && !item.stripe_customer_id && (
                         <button
                           onClick={() => {
                             // Calculate next month
@@ -473,6 +479,7 @@ export default function GestionPagosPage() {
                   <option value="efectivo">Efectivo</option>
                   <option value="transferencia">Transferencia</option>
                   <option value="tarjeta">Tarjeta</option>
+                  <option value="stripe">Stripe</option>
                   <option value="otro">Otro</option>
                 </select>
               </div>

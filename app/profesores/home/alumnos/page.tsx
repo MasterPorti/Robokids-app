@@ -17,11 +17,20 @@ interface Alumno {
   activo: boolean;
 }
 
+interface PasswordModalData {
+  username: string;
+  password: string;
+  nombreAlumno: string;
+  telefonoTutor: string;
+}
+
 export default function AlumnosPage() {
   const [alumnos, setAlumnos] = useState<Alumno[]>([]);
   const [loading, setLoading] = useState(true);
   const [busqueda, setBusqueda] = useState("");
   const [profesorId, setProfesorId] = useState<string | null>(null);
+  const [filtroActivo, setFiltroActivo] = useState<"activos" | "inactivos" | "todos">("activos");
+  const [passwordModal, setPasswordModal] = useState<PasswordModalData | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -65,14 +74,29 @@ export default function AlumnosPage() {
     }
   }
 
-  async function eliminarAlumno(id: string, nombre: string) {
-    if (!confirm(`¿Estás seguro de eliminar a ${nombre}? Esta acción no se puede deshacer.`)) {
+  async function desactivarAlumno(id: string, nombre: string, activo: boolean) {
+    const accion = activo ? "desactivar" : "activar";
+    if (!confirm(`¿Estás seguro de ${accion} a ${nombre}?`)) {
       return;
     }
 
     try {
+      // Obtener el token de sesión
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+
+      if (!token) {
+        alert("Error: No se encontró una sesión válida");
+        return;
+      }
+
       const res = await fetch(`/api/alumnos/${id}`, {
-        method: "DELETE",
+        method: "PUT",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ activo: !activo })
       });
 
       const data = await res.json();
@@ -80,16 +104,18 @@ export default function AlumnosPage() {
       if (data.error) {
         alert("Error: " + data.error);
       } else {
-        alert("Alumno eliminado correctamente");
+        alert(`Alumno ${accion === "desactivar" ? "desactivado" : "activado"} correctamente`);
         // Recargar lista
         if (profesorId) await cargarAlumnos(profesorId);
       }
     } catch (error) {
-      alert("Error al eliminar alumno");
+      alert("Error al cambiar estado del alumno");
     }
   }
 
   async function cambiarPassword(id: string, nombre: string) {
+    const alumno = alumnos.find(a => a.id === id);
+
     if (
       !confirm(
         `¿Generar nueva contraseña para ${nombre}?\n\n⚠️ La contraseña actual dejará de funcionar inmediatamente.`
@@ -99,8 +125,20 @@ export default function AlumnosPage() {
     }
 
     try {
+      // Obtener el token de sesión
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+
+      if (!token) {
+        alert("Error: No se encontró una sesión válida");
+        return;
+      }
+
       const res = await fetch(`/api/alumnos/${id}/cambiar-password`, {
         method: "POST",
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
       });
 
       const data = await res.json();
@@ -119,15 +157,13 @@ export default function AlumnosPage() {
           );
         }
       } else {
-        // Éxito - Mostrar las nuevas credenciales
-        const mensaje = `✅ ¡Contraseña actualizada exitosamente!\n\n` +
-          `📋 NUEVAS CREDENCIALES:\n` +
-          `👤 Usuario: ${data.username}\n` +
-          `🔑 Contraseña: ${data.password}\n\n` +
-          `⚠️ IMPORTANTE: ¡Anótala ahora! No se volverá a mostrar.\n\n` +
-          `La contraseña anterior ya no funciona.`;
-
-        alert(mensaje);
+        // Éxito - Mostrar modal con las nuevas credenciales
+        setPasswordModal({
+          username: data.username,
+          password: data.password,
+          nombreAlumno: nombre,
+          telefonoTutor: alumno?.telefono_tutor || ""
+        });
 
         // Copiar automáticamente al portapapeles si está disponible
         if (navigator.clipboard) {
@@ -135,7 +171,6 @@ export default function AlumnosPage() {
             await navigator.clipboard.writeText(
               `Usuario: ${data.username}\nContraseña: ${data.password}`
             );
-            alert("✅ Credenciales copiadas al portapapeles");
           } catch (err) {
             // No se pudo copiar al portapapeles
           }
@@ -146,13 +181,60 @@ export default function AlumnosPage() {
     }
   }
 
-  // Filtrar alumnos por búsqueda
-  const alumnosFiltrados = alumnos.filter(
-    (alumno) =>
+  function enviarPorWhatsApp() {
+    if (!passwordModal) return;
+
+    const mensaje = encodeURIComponent(
+      `Hola! 👋\n\n` +
+      `Te envío las nuevas credenciales de acceso para *${passwordModal.nombreAlumno}*:\n\n` +
+      `👤 *Usuario:* ${passwordModal.username}\n` +
+      `🔑 *Contraseña:* ${passwordModal.password}\n\n` +
+      `⚠️ *IMPORTANTE:* La contraseña anterior ya no funciona.\n\n` +
+      `Puedes acceder en: https://tu-app-robokids.com/alumnos`
+    );
+
+    // Limpiar el número de teléfono (quitar espacios, guiones, etc)
+    const telefono = passwordModal.telefonoTutor.replace(/\D/g, '');
+
+    // Abrir WhatsApp Web con el mensaje prellenado
+    const whatsappUrl = `https://wa.me/${telefono}?text=${mensaje}`;
+    window.open(whatsappUrl, '_blank');
+
+    // Cerrar el modal después de abrir WhatsApp
+    setPasswordModal(null);
+  }
+
+  function copiarCredenciales() {
+    if (!passwordModal) return;
+
+    const texto = `Usuario: ${passwordModal.username}\nContraseña: ${passwordModal.password}`;
+
+    navigator.clipboard.writeText(texto).then(() => {
+      alert("✅ Credenciales copiadas al portapapeles");
+    }).catch(() => {
+      alert("❌ No se pudo copiar al portapapeles");
+    });
+  }
+
+  // Filtrar alumnos por búsqueda y estado
+  const alumnosFiltrados = alumnos.filter((alumno) => {
+    // Filtro por búsqueda
+    const coincideBusqueda =
       alumno.nombre_completo.toLowerCase().includes(busqueda.toLowerCase()) ||
       alumno.username.toLowerCase().includes(busqueda.toLowerCase()) ||
-      alumno.nombre_tutor.toLowerCase().includes(busqueda.toLowerCase())
-  );
+      alumno.nombre_tutor.toLowerCase().includes(busqueda.toLowerCase());
+
+    // Filtro por estado
+    let coincideEstado = true;
+    if (filtroActivo === "activos") {
+      coincideEstado = alumno.activo === true;
+    } else if (filtroActivo === "inactivos") {
+      coincideEstado = alumno.activo === false;
+    }
+    // Si es "todos", coincideEstado permanece true
+
+    return coincideBusqueda && coincideEstado;
+  });
 
   if (loading) {
     return (
@@ -182,40 +264,46 @@ export default function AlumnosPage() {
         </div>
       </div>
 
-      {/* Buscador */}
-      <div className="mb-6">
+      {/* Buscador y Filtros */}
+      <div className="mb-6 flex gap-4 flex-col md:flex-row">
         <input
           type="text"
           placeholder="Buscar por nombre, usuario o tutor..."
           value={busqueda}
           onChange={(e) => setBusqueda(e.target.value)}
-          className="w-full p-3 bg-gray-800 border border-gray-600 text-white placeholder-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="flex-1 p-3 bg-gray-800 border border-gray-600 text-white placeholder-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
+        <select
+          value={filtroActivo}
+          onChange={(e) => setFiltroActivo(e.target.value as "activos" | "inactivos" | "todos")}
+          className="p-3 bg-gray-800 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          <option value="activos">Solo Activos</option>
+          <option value="inactivos">Solo Inactivos</option>
+          <option value="todos">Todos</option>
+        </select>
       </div>
 
       {/* Estadísticas */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         <div className="bg-blue-900/30 p-4 rounded-lg border border-blue-600">
           <p className="text-sm text-gray-300">Total de Alumnos</p>
           <p className="text-3xl font-bold text-blue-400">{alumnos.length}</p>
         </div>
         <div className="bg-green-900/30 p-4 rounded-lg border border-green-600">
-          <p className="text-sm text-gray-300">Inscritos este mes</p>
+          <p className="text-sm text-gray-300">Alumnos Activos</p>
           <p className="text-3xl font-bold text-green-400">
-            {
-              alumnos.filter((a) => {
-                const fecha = new Date(a.fecha_inscripcion);
-                const hoy = new Date();
-                return (
-                  fecha.getMonth() === hoy.getMonth() &&
-                  fecha.getFullYear() === hoy.getFullYear()
-                );
-              }).length
-            }
+            {alumnos.filter((a) => a.activo).length}
+          </p>
+        </div>
+        <div className="bg-red-900/30 p-4 rounded-lg border border-red-600">
+          <p className="text-sm text-gray-300">Alumnos Inactivos</p>
+          <p className="text-3xl font-bold text-red-400">
+            {alumnos.filter((a) => !a.activo).length}
           </p>
         </div>
         <div className="bg-purple-900/30 p-4 rounded-lg border border-purple-600">
-          <p className="text-sm text-gray-300">Resultados de búsqueda</p>
+          <p className="text-sm text-gray-300">Resultados mostrados</p>
           <p className="text-3xl font-bold text-purple-400">
             {alumnosFiltrados.length}
           </p>
@@ -306,12 +394,16 @@ export default function AlumnosPage() {
                       </button>
                       <button
                         onClick={() =>
-                          eliminarAlumno(alumno.id, alumno.nombre_completo)
+                          desactivarAlumno(alumno.id, alumno.nombre_completo, alumno.activo)
                         }
-                        className="px-3 py-1 bg-red-500 text-white text-sm rounded hover:bg-red-600"
-                        title="Eliminar"
+                        className={`px-3 py-1 text-white text-sm rounded ${
+                          alumno.activo
+                            ? "bg-orange-500 hover:bg-orange-600"
+                            : "bg-green-500 hover:bg-green-600"
+                        }`}
+                        title={alumno.activo ? "Desactivar" : "Activar"}
                       >
-                        🗑️ Eliminar
+                        {alumno.activo ? "🚫 Desactivar" : "✅ Activar"}
                       </button>
                     </div>
                   </td>
@@ -319,6 +411,80 @@ export default function AlumnosPage() {
               ))}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {/* Modal de Credenciales */}
+      {passwordModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50">
+          <div className="bg-gray-900 rounded-lg shadow-2xl max-w-md w-full border border-gray-700">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-2xl font-bold text-green-400">
+                  ✅ Contraseña Actualizada
+                </h2>
+                <button
+                  onClick={() => setPasswordModal(null)}
+                  className="text-gray-400 hover:text-white text-2xl"
+                >
+                  ×
+                </button>
+              </div>
+
+              <div className="mb-6">
+                <p className="text-gray-300 mb-4">
+                  Nuevas credenciales para <span className="font-bold text-white">{passwordModal.nombreAlumno}</span>:
+                </p>
+
+                <div className="bg-gray-800 rounded-lg p-4 mb-4 border border-gray-700">
+                  <div className="mb-3">
+                    <p className="text-sm text-gray-400 mb-1">Usuario:</p>
+                    <p className="text-lg font-mono text-white bg-gray-700 px-3 py-2 rounded">
+                      {passwordModal.username}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-400 mb-1">Contraseña:</p>
+                    <p className="text-lg font-mono text-white bg-gray-700 px-3 py-2 rounded">
+                      {passwordModal.password}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="bg-yellow-900/30 border border-yellow-600 rounded-lg p-3 mb-4">
+                  <p className="text-sm text-yellow-200">
+                    ⚠️ <strong>IMPORTANTE:</strong> La contraseña anterior ya no funciona.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-3">
+                <button
+                  onClick={enviarPorWhatsApp}
+                  className="w-full px-4 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
+                >
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                  </svg>
+                  Enviar por WhatsApp
+                </button>
+
+                <button
+                  onClick={copiarCredenciales}
+                  className="w-full px-4 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  📋 Copiar Credenciales
+                </button>
+
+                <button
+                  onClick={() => setPasswordModal(null)}
+                  className="w-full px-4 py-3 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors"
+                >
+                  Cerrar
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>

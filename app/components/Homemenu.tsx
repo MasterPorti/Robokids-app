@@ -11,8 +11,8 @@ const drawComponents = {
 };
 
 const mapping: { link: string; status: "completed" | "next" | "locked" }[] = [
-  { link: "/nivel-1", status: "completed" },
-  { link: "/nivel-2", status: "next" },
+  { link: "game/nivel?id=respaso-clase-cero", status: "completed" },
+  { link: "game/nivel?id=circuito-serie-1", status: "next" },
   { link: "/nivel-3", status: "locked" },
   { link: "/nivel-4", status: "locked" },
   { link: "/nivel-5", status: "locked" },

@@ -1,13 +1,15 @@
 interface AnswerButtonsProps {
   answers: (string | null)[];
   onButtonClick: (value: string, element: HTMLButtonElement) => void;
+  opciones?: string[];
 }
 
 export default function AnswerButtons({
   answers,
   onButtonClick,
+  opciones,
 }: AnswerButtonsProps) {
-  const options = ["Positivo", "Negativo"];
+  const options = opciones || ["Positivo", "Negativo"];
 
   return (
     <div

@@ -8,7 +8,7 @@ interface CreatePagoData {
   periodo_anio: number;
   fecha_pago: string;
   monto: number;
-  metodo_pago: "efectivo" | "transferencia" | "otro";
+  metodo_pago: "efectivo" | "transferencia" | "tarjeta" | "stripe" | "otro";
   notas?: string;
 }
 

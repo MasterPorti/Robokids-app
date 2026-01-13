@@ -50,7 +50,7 @@ export async function GET(request: NextRequest) {
 
     const { data: alumno, error: alumnoError } = await supabaseAdmin
       .from("alumnos")
-      .select("id, nombre_completo, mensualidad")
+      .select("id, nombre_completo, mensualidad, profesor_id, stripe_customer_id")
       .eq("username", username)
       .single();
 
@@ -114,14 +114,93 @@ export async function GET(request: NextRequest) {
           period_start: new Date(suscripcionActiva.current_period_start),
           period_end: new Date(suscripcionActiva.current_period_end),
         });
+
+        // 🔥 REGISTRAR AUTOMÁTICAMENTE EL PAGO SI NO EXISTE
+        if (!pago && alumno.profesor_id) {
+          try {
+            const customerId = typeof suscripcion.customer === "string"
+              ? suscripcion.customer
+              : suscripcion.customer?.id;
+
+            // Actualizar stripe_customer_id si no está guardado
+            if (!alumno.stripe_customer_id && customerId) {
+              await supabaseAdmin
+                .from("alumnos")
+                .update({ stripe_customer_id: customerId })
+                .eq("id", alumno.id);
+            }
+
+            // Registrar el pago automáticamente
+            const { data: nuevoPago, error: pagoInsertError } = await supabaseAdmin
+              .from("pagos")
+              .insert({
+                alumno_id: alumno.id,
+                profesor_id: alumno.profesor_id,
+                periodo_mes: currentMonth,
+                periodo_anio: currentYear,
+                fecha_pago: new Date().toISOString().split("T")[0],
+                monto: (suscripcionActiva.amount / 100), // Convertir de centavos
+                metodo_pago: "stripe",
+                notas: `Pago automático vía Stripe - Suscripción: ${suscripcion.id}`,
+              })
+              .select()
+              .single();
+
+            if (!pagoInsertError && nuevoPago) {
+              console.log("✅ Pago registrado automáticamente:", nuevoPago.id);
+              // Actualizar la variable pago para que se devuelva en la respuesta
+              const { data: pagoActualizado } = await supabaseAdmin
+                .from("pagos")
+                .select("*")
+                .eq("id", nuevoPago.id)
+                .single();
+
+              if (pagoActualizado) {
+                // Reasignar para que se use en la respuesta
+                Object.assign(pago || {}, pagoActualizado);
+              }
+            } else if (pagoInsertError) {
+              console.error("Error al registrar pago automático:", pagoInsertError);
+            }
+          } catch (autoPayError) {
+            console.error("Error en registro automático de pago:", autoPayError);
+            // No lanzar error, solo loguear
+          }
+        }
       }
     } catch (stripeError) {
       console.error("Error al verificar Stripe:", stripeError);
       // Continuar aunque falle Stripe
     }
 
+    // Volver a verificar el pago después del posible registro automático
+    const { data: pagoFinal } = await supabaseAdmin
+      .from("pagos")
+      .select("*")
+      .eq("alumno_id", alumno.id)
+      .eq("periodo_mes", currentMonth)
+      .eq("periodo_anio", currentYear)
+      .maybeSingle();
+
     // El alumno tiene pago si existe en la tabla local O tiene suscripción activa
-    const yaPago = !!pago || !!suscripcionActiva;
+    const yaPago = !!pagoFinal || !!suscripcionActiva;
+
+    // Detectar si es pago por nivel (verificar en las notas)
+    const esPagoNivel = pagoFinal?.notas?.includes("Pago por Nivel") || false;
+
+    // Verificar si el siguiente mes ya está pagado (para el botón de adelanto)
+    const siguienteMes = currentMonth === 12 ? 1 : currentMonth + 1;
+    const siguienteAnio = currentMonth === 12 ? currentYear + 1 : currentYear;
+
+    const { data: pagoSiguienteMes } = await supabaseAdmin
+      .from("pagos")
+      .select("*")
+      .eq("alumno_id", alumno.id)
+      .eq("periodo_mes", siguienteMes)
+      .eq("periodo_anio", siguienteAnio)
+      .maybeSingle();
+
+    const siguienteMesPagado = !!pagoSiguienteMes;
 
     return NextResponse.json({
       success: true,
@@ -131,8 +210,10 @@ export async function GET(request: NextRequest) {
       mes_actual: currentMonth,
       anio_actual: currentYear,
       ya_pago: yaPago,
-      pago: pago || null,
+      pago: pagoFinal || null,
       suscripcion_stripe: suscripcionActiva,
+      es_pago_nivel: esPagoNivel,
+      siguiente_mes_pagado: siguienteMesPagado,
     });
   } catch (error) {
     console.error("Error en GET /api/alumno/pago-estado:", error);

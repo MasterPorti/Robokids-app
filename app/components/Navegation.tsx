@@ -21,9 +21,6 @@ export default function Navbar() {
         <Button text="Ligas" isActive={false}>
           <LeaguesLogo />
         </Button>
-        <Button text="Pagos" isActive={false}>
-          <PaymentsLogo />
-        </Button>
       </nav>
     </div>
   );

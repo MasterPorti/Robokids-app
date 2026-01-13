@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
     // Query active students
     const { data: alumnos, error } = await supabase
       .from("alumnos")
-      .select("id, nombre_completo, mensualidad")
+      .select("id, nombre_completo, mensualidad, stripe_customer_id")
       .eq("profesor_id", profesorId)
       .eq("activo", true)
       .order("nombre_completo", { ascending: true });

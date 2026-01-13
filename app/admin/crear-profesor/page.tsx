@@ -1,6 +1,5 @@
 "use client";
 import { useState } from "react";
-import { supabase } from "@/lib/supabase";
 import Link from "next/link";
 
 interface FormDataProfesor {
@@ -26,26 +25,21 @@ export default function CrearProfesorPage() {
     e.preventDefault();
     setMensaje("Creando...");
 
-    // Email: usar el real si lo proporcionó, sino generar uno falso
-    const emailFinal = formData.email || `${formData.usuario}@sistema.local`;
-
-    const { data, error } = await supabase.auth.signUp({
-      email: emailFinal,
-      password: formData.password,
-      options: {
-        // Guardamos todos los datos del profesor en metadata
-        data: {
-          username: formData.usuario,
-          nombre_completo: formData.nombreCompleto,
-          telefono: formData.telefono,
-          role: "profesor",
+    try {
+      const response = await fetch("/api/admin/profesores", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      },
-    });
+        body: JSON.stringify(formData),
+      });
 
-    if (error) {
-      setMensaje("❌ Error: " + error.message);
-    } else {
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || "Error al crear profesor");
+      }
+
       setMensaje(`✅ Profesor "${formData.nombreCompleto}" (${formData.usuario}) creado exitosamente.`);
       // Resetear formulario
       setFormData({
@@ -55,6 +49,9 @@ export default function CrearProfesorPage() {
         email: "",
         telefono: "",
       });
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Error desconocido";
+      setMensaje("❌ Error: " + errorMessage);
     }
   }
 

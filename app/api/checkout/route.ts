@@ -3,15 +3,24 @@ import Stripe from "stripe";
 
 // Inicializamos Stripe con la clave secreta
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2025-12-15.clover", // Usa la versión más reciente que te sugiera VS Code
+  apiVersion: "2025-12-15.clover",
 });
+
+// Tipos de planes disponibles
+type TipoPlan = "mensual_unico" | "suscripcion_mensual" | "nivel_completo";
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { userId, userName } = body;
+    const { userId, userName, tipoPlan, periodoMes, periodoAnio } = body as {
+      userId: string;
+      userName: string;
+      tipoPlan: TipoPlan;
+      periodoMes?: number;
+      periodoAnio?: number;
+    };
 
-    // Validación simple
+    // Validación
     if (!userId || !userName) {
       return NextResponse.json(
         { error: "Faltan datos del usuario" },
@@ -19,37 +28,81 @@ export async function POST(request: Request) {
       );
     }
 
-    // Crear la sesión de Checkout
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ["card"],
-      mode: "subscription", // MODO SUSCRIPCIÓN (Recurrente)
+    if (!tipoPlan) {
+      return NextResponse.json(
+        { error: "Debes seleccionar un tipo de plan" },
+        { status: 400 }
+      );
+    }
 
-      // Aquí defines qué producto se cobra
+    // Configuración de cada plan
+    const planesConfig = {
+      mensual_unico: {
+        priceId: process.env.STRIPE_PRICE_MENSUAL_UNICO!,
+        mode: "payment" as const,
+        descripcion: "Pago Mensual Único",
+      },
+      suscripcion_mensual: {
+        priceId: process.env.STRIPE_PRICE_SUSCRIPCION_MENSUAL!,
+        mode: "subscription" as const,
+        descripcion: "Suscripción Mensual Recurrente",
+      },
+      nivel_completo: {
+        priceId: process.env.STRIPE_PRICE_NIVEL_COMPLETO!,
+        mode: "payment" as const,
+        descripcion: "Plan Completo por Niveles (6 meses)",
+      },
+    };
+
+    const planSeleccionado = planesConfig[tipoPlan];
+
+    if (!planSeleccionado || !planSeleccionado.priceId) {
+      return NextResponse.json(
+        { error: "Plan no válido o Price ID no configurado en variables de entorno" },
+        { status: 400 }
+      );
+    }
+
+    // Configuración base de la sesión
+    const sessionConfig: Stripe.CheckoutSessionCreateParams = {
+      payment_method_types: ["card"],
+      mode: planSeleccionado.mode,
       line_items: [
         {
-          price: "price_1SjUJOCxKT4dA2MXyusprGRK", // <--- PEGA AQUÍ TU PRICE ID DE STRIPE
+          price: planSeleccionado.priceId,
           quantity: 1,
         },
       ],
-
-      // IMPORTANTE: Aquí pasamos tus datos personalizados
       metadata: {
         userId: userId,
         userName: userName,
+        tipoPlan: tipoPlan,
+        descripcion: planSeleccionado.descripcion,
         source: "web_app",
+        ...(periodoMes && { periodoMes: periodoMes.toString() }),
+        ...(periodoAnio && { periodoAnio: periodoAnio.toString() }),
       },
+      success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/alumnos/pagos?payment=success&session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/alumnos/pagos?payment=cancelled`,
+    };
 
-      // También es buena práctica ponerlo en los datos de la suscripción
-      subscription_data: {
+    // Si es suscripción, agregar metadata a subscription_data
+    if (planSeleccionado.mode === "subscription") {
+      sessionConfig.subscription_data = {
         metadata: {
           userId: userId,
           userName: userName,
+          tipoPlan: tipoPlan,
         },
-      },
+      };
+    }
 
-      // Redirecciones
-      success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/alumnos/pagos?payment=success`,
-      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/alumnos/pagos?payment=cancelled`,
+    // Crear la sesión de Checkout
+    const session = await stripe.checkout.sessions.create(sessionConfig);
+
+    console.log(`Sesión creada para ${userName}:`, {
+      plan: planSeleccionado.descripcion,
+      sessionId: session.id,
     });
 
     // Devolvemos la URL a la que el frontend debe redirigir

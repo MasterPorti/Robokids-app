@@ -1,23 +1,8 @@
-export default function Battery({
-  width,
-  absolute,
-  top,
-  left,
-}: {
-  width: number;
-  absolute: boolean;
-  top: number;
-  left: number;
-}) {
+export default function Battery({ width }: { width: number }) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       width={width}
-      className={`${absolute ? "absolute" : ""}`}
-      style={{
-        top: absolute ? top : undefined,
-        left: absolute ? left : undefined,
-      }}
       fill="none"
       viewBox="0 0 892 446"
     >
