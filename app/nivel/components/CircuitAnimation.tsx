@@ -44,8 +44,12 @@ export default function CircuitAnimation({
 
   return (
     <div className="relative w-125 h-125 border-white">
-      <Battery width={200} absolute={true} top={90} left={300} />
-      <Battery width={200} absolute={true} top={290} left={300} />
+      <div style={{ position: "absolute", top: 90, left: 300 }}>
+        <Battery width={200} />
+      </div>
+      <div style={{ position: "absolute", top: 290, left: 300 }}>
+        <Battery width={200} />
+      </div>
       <svg
         width="500"
         height="500"

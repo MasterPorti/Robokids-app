@@ -64,7 +64,7 @@ export async function POST(request: Request) {
     }
 
     // Configuración base de la sesión
-    const sessionConfig: Stripe.CheckoutSessionCreateParams = {
+    const sessionConfig: Stripe.Checkout.SessionCreateParams = {
       payment_method_types: ["card"],
       mode: planSeleccionado.mode,
       line_items: [
