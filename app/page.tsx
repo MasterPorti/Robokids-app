@@ -30,7 +30,7 @@ export default function HomePage() {
             >
               Profesores
             </Link>
-            <div className="px-4 mt-3 py-2 w-full max-w-80  bg-gray-600 text-white rounded-xl border-b-4 border-gray-800text-xl">
+            <div className="px-4 mt-3 py-2 w-full max-w-80  bg-gray-600 text-white rounded-xl border-b-4 border-gray-800 text-xl">
               Alumnos
             </div>
           </div>
