@@ -8,8 +8,8 @@ export default function HomePage() {
       <div className="flex-1 flex justify-center">
         <div className="max-w-[80%] w-full flex sm:flex-row flex-col items-center text-center ">
           <Image
-            width={500}
-            height={300}
+            width={1000}
+            height={600}
             src={"/render.jpg"}
             alt=""
             className="sm:w-1/2 w-full"

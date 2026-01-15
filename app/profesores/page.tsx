@@ -42,8 +42,8 @@ export default function LoginProfesores() {
       <div className="flex-1 flex justify-center">
         <div className="max-w-[80%] w-full flex md:flex-row flex-col items-center text-center ">
           <Image
-            width={500}
-            height={300}
+            width={1000}
+            height={600}
             src={"/teacherlogin.jpg"}
             alt=""
             className="md:w-1/2 w-full"
