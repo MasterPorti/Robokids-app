@@ -92,7 +92,14 @@ export default function HomeProfesores() {
 
   if (loading) {
     return (
-      <div className="bg-black text-white" style={{ padding: "40px", minHeight: "100vh" }}>
+      <div
+        className="bg-black text-white"
+        style={{
+          padding: "40px",
+          minHeight: "100vh",
+          fontFamily: "var(--font-custom)",
+        }}
+      >
         <div style={{ maxWidth: "1400px", margin: "0 auto" }}>
           {/* Header Skeleton */}
           <div style={{ marginBottom: "30px" }}>
@@ -101,7 +108,14 @@ export default function HomeProfesores() {
           </div>
 
           {/* Stats Skeleton */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: "20px", marginBottom: "30px" }}>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
+              gap: "20px",
+              marginBottom: "30px",
+            }}
+          >
             <div className="animate-pulse bg-gradient-to-br from-purple-900 to-purple-800 h-32 rounded-lg"></div>
             <div className="animate-pulse bg-gradient-to-br from-red-900 to-red-800 h-32 rounded-lg"></div>
           </div>
@@ -110,7 +124,13 @@ export default function HomeProfesores() {
           <div className="animate-pulse bg-gray-800 h-6 w-48 rounded mb-5"></div>
 
           {/* Cards Skeleton */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "20px" }}>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+              gap: "20px",
+            }}
+          >
             <div className="animate-pulse bg-gray-800 h-48 rounded-lg"></div>
             <div className="animate-pulse bg-gray-800 h-48 rounded-lg"></div>
             <div className="animate-pulse bg-gray-800 h-48 rounded-lg"></div>
@@ -121,7 +141,14 @@ export default function HomeProfesores() {
   }
 
   return (
-    <div className="bg-black text-white" style={{ padding: "40px", minHeight: "100vh" }}>
+    <div
+      className="bg-white text-black"
+      style={{
+        padding: "40px",
+        minHeight: "100vh",
+        fontFamily: "var(--font-custom)",
+      }}
+    >
       <div
         style={{
           display: "flex",
@@ -130,7 +157,7 @@ export default function HomeProfesores() {
           paddingBottom: "20px",
         }}
       >
-        <h1>Panel del Profesor</h1>
+        <h1 className="text-2xl">Panel del Profesor</h1>
         <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
           <span>
             Hola, <b>{usuario?.user_metadata?.username || "Profesor"}</b>

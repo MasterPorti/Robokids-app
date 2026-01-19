@@ -35,7 +35,13 @@ export async function POST(request: NextRequest) {
     // 2. Generar Usuario y Contraseña automáticos
     // Ejemplo: juan.perez + 3 números al azar
     const randomNum = Math.floor(100 + Math.random() * 900);
-    const nombreBase = datos.nombre.split(" ")[0].toLowerCase();
+    // Normalizar nombre: quitar acentos y caracteres especiales
+    const nombreBase = datos.nombre
+      .split(" ")[0]
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]/g, "");
     const username = `${nombreBase}${randomNum}`;
 
     // Contraseña de 6 caracteres aleatoria
